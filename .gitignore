@@ -1,0 +1,12 @@
+# 컴파일된 파일 무시
+target/
+*.class
+
+# 이클립스 설정 파일 무시
+.metadata/
+.settings/
+.classpath
+.project
+
+# 기타
+*.log
