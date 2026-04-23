@@ -16,6 +16,8 @@ public class LoginController
 	@Autowired
 	private MemberService memberService;
 	
+	
+
 	// 1. 로그인 화면 띄우기 (Get요청)
 	@GetMapping("/login.do")
 	public String loginForm()
@@ -73,6 +75,22 @@ public class LoginController
 		}
 		return "login/main";
 	}
+	
+	// 4. 회원가입 폼 화면 (Get요청)
+	@GetMapping("/register.do")
+	public String registerForm()
+	{
+	    return "login/register";
+	}
+
+	// 5. 회원가입 처리 (Post요청)
+	@PostMapping("/registerProcess.do")
+	public String registerProcess(@ModelAttribute MemberVO member, Model model)
+	{
+	    memberService.register(member);
+	    return "redirect:/login.do";
+	}
+	
 	
 	@GetMapping("/logout.do")
 	public String logout(HttpSession session)

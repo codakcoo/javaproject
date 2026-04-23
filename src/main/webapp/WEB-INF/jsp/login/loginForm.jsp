@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
+    <title>회원가입</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -188,7 +189,20 @@
             </svg>
         </div>
 -->
+    
+<form action="${pageContext.request.contextPath}/registerProcess.do" method="post">
+</form>
+        
+        
+        
+        
+        
         <span class="logo-text">전자정부 표준프레임워크</span>
+    
+    
+    
+    
+    
     </div>
 
     <h1>로그인</h1>
@@ -210,7 +224,9 @@
         </div>
         <button type="submit" class="btn">로그인</button>
     </form>
-
+	<a href="${pageContext.request.contextPath}/register.do">
+    <button type="button" class="btn" style="background:#64748B; margin-top:0;">회원가입</button>
+</a>
     <div class="divider"></div>
     <p class="footer-text">© 2025 전자정부 표준프레임워크</p>
 
