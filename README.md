@@ -101,6 +101,8 @@
 <img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/518b20ac-a3de-4fdf-8279-5b3fae7a2d70" />
 <h5>회원가입 화면</h5>
 <img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/7e765dd5-61d0-47ba-81d5-e02c08e6b2d5" />
+<h5>메인 화면</h5>
+<img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/7ffc9832-c01d-4a26-8ba4-b000e9455998" />
 
 
 
