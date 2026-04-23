@@ -21,4 +21,5 @@ target/
 
 # 5. OS 생성 임시 파일 (맥북 사용자 팀원이 있다면 필수)
 .DS_Store
-Thumbs.db.factorypath
+Thumbs.db
+.factorypath
