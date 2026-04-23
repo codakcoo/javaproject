@@ -1,4 +1,9 @@
 <h2>자바 프로젝트</h2>
+
+
+<p>버전: 전자정부프레임워크 4.3</p>
+<p>서버: Tomcat 9.0v</p>
+<p>DB:   MySQL</p>
 <hr style="border: 0; height: 2px; background: black; width: 50%;">
 
 <h3>git 명령어</h3>
