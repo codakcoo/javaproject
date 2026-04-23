@@ -1,24 +1,12 @@
-# 1. Eclipse 설정 파일 (개인마다 다름, 충돌의 주범!)
-.metadata/
-.settings/
-.project
-.classpath
-.factorypath
-
-# 2. Maven 빌드 결과물 (코드 실행 시 자동 생성되므로 공유할 필요 없음)
+# 컴파일된 파일 무시
 target/
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# 3. 컴파일된 클래스 파일
 *.class
 
-# 4. 로그 파일
-*.log
+# 이클립스 설정 파일 무시
+.metadata/
+.settings/
+.classpath
+.project
 
-# 5. OS 생성 임시 파일 (맥북 사용자 팀원이 있다면 필수)
-.DS_Store
-Thumbs.db
+# 기타
+*.log
