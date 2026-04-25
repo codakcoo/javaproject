@@ -27,6 +27,16 @@
 	    <property name="username" value="root"/>
 	    <property name="password" value="1234"/>
 	</bean>
+	<!-- flyway (DB 연결 설정) -->
+	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+	    <property name="dataSource" ref="dataSource" />
+	    <property name="baselineOnMigrate" value="false" />
+	    <property name="locations" value="classpath:db/migration" />
+	</bean>
+
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+    	<constructor-arg ref="flywayConfig" />
+	</bean>
     
     <!-- oracle (POM에서 commons-dbcp, ojdbc(라이센스 사항으로 별도로 배포되지 않음) 관련 라이브러리 설정)
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">

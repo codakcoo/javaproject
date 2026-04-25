@@ -162,6 +162,18 @@
 			<artifactId>spring-security-crypto</artifactId>
 			<version>5.7.3</version>
 		</dependency>
+		<!-- Flyway DB구조 설계 라이브러리 -->
+		<dependency>
+		    <groupId>org.flywaydb</groupId>
+		    <artifactId>flyway-core</artifactId>
+    		<version>8.5.13</version> 
+    	</dependency>
+    	<!-- Flyway에 MySQL 8 지원을 위해 추가 필수 -->
+		<dependency>
+    		<groupId>org.flywaydb</groupId>
+    		<artifactId>flyway-mysql</artifactId>
+    		<version>8.5.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>
