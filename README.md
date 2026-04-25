@@ -2,6 +2,7 @@
 
 
 <p><strong>버전</strong>: 전자정부프레임워크 4.3</p>
+<p><strong>모델</strong>: MVC2</p>
 <p><strong>서버</strong>: Tomcat 9.0v</p>
 <p><strong>DB</strong>:   MySQL</p>
 <p><strong>DB초기 설정</strong>: Flyway(8.5.13)</p>
@@ -9,6 +10,31 @@
 
 <h2>Java/Spring MVC2 팀 프로젝트 협업 가이드</h2>
 본 저장소는 전자정부프레임워크(eGovFrame) 기반의 웹 애플리케이션(ERP 시스템 등) 개발을 위한 캡스톤 프로젝트 저장소입니다. 원활한 팀 협업을 위해 아래의 Git 명령어와 규칙을 반드시 숙지하고 개발을 진행해 주세요.
+
+## 🏛️Spring MVC2 아키텍처 동작 흐름
+
+```mermaid
+sequenceDiagram
+    actor Client as 👤 사용자 (Browser)
+    participant DS as 🚦 DispatcherServlet
+    participant Controller as 🎮 Controller
+    participant Service as ⚙️ Service (Impl)
+    participant Mapper as 💾 Mapper (MyBatis)
+    participant DB as 🗄️ MySQL DB
+    participant View as 🖥️ View (JSP)
+
+    Client->>DS: 1. 화면 요청 (URL 입력/버튼 클릭)
+    DS->>Controller: 2. 알맞은 Controller로 요청 전달
+    Controller->>Service: 3. 비즈니스 로직(핵심 기능) 실행 요청
+    Service->>Mapper: 4. DB 데이터가 필요할 경우 Mapper 호출
+    Mapper->>DB: 5. SQL 쿼리 실행
+    DB-->>Mapper: 6. 쿼리 결과 반환
+    Mapper-->>Service: 7. 결과 데이터(VO/DTO) 전달
+    Service-->>Controller: 8. 로직 처리 완료 및 데이터 반환
+    Controller-->>DS: 9. 화면에 뿌려줄 Model(데이터)과 View(JSP 이름) 반환
+    DS->>View: 10. JSP 파일에 데이터 세팅 요청
+    View-->>Client: 11. 완성된 HTML을 사용자에게 응답
+```
 
 
 <h3> 📌 1. 팀 협업 기본 원칙 (매우 중요) </h3>
