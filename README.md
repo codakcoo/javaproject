@@ -4,6 +4,7 @@
 <p><strong>버전</strong>: 전자정부프레임워크 4.3</p>
 <p><strong>서버</strong>: Tomcat 9.0v</p>
 <p><strong>DB</strong>:   MySQL</p>
+<p><strong>DB초기 설정</strong>: Flyway(8.5.13)</p>
 <hr style="border: 0; height: 2px; background: black; width: 50%;">
 
 <h2>Java/Spring MVC2 팀 프로젝트 협업 가이드</h2>
@@ -96,6 +97,7 @@
 <h3>git 명령어</h3>
 <img width="843" height="267" alt="image" src="https://github.com/user-attachments/assets/be1bdd6d-1825-4af9-ad4c-3139c090c884" />
 <hr style="border: 0; height: 2px; background: black; width: 50%;">
+
 <h3>진행상황</h3>
 <h5>로그인 화면</h5>
 <img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/518b20ac-a3de-4fdf-8279-5b3fae7a2d70" />
@@ -103,9 +105,67 @@
 <img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/7e765dd5-61d0-47ba-81d5-e02c08e6b2d5" />
 <h5>메인 화면</h5>
 <img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/7ffc9832-c01d-4a26-8ba4-b000e9455998" />
+<h5>직원관리</h5>
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/27926ef3-3884-43f5-aabe-3fc52661830a" />
+<h5>전자결재</h5>
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/62b6e204-13fd-4218-8aaa-a26a1be3406b" />
 
+---
+<h3>DB 설정</h3>
+## 🗄️ 5. 데이터베이스(DB) 세팅 및 자동화 가이드
 
+우리 프로젝트는 로컬 환경의 **MySQL**을 데이터베이스로 사용하며, 팀원 간의 완벽한 DB 구조 동기화를 위해 **Flyway**를 도입하여 테이블 생성을 자동화했습니다. 팀원 여러분은 아래의 개념과 규칙을 숙지해 주세요.
 
+### 🐬 MySQL (데이터베이스 서버)
+MySQL은 데이터를 저장하는 '건물(사무실)'과 같습니다. 프로젝트를 구동하기 위해 각자의 PC에 무조건 설치되어 실행 중이어야 합니다.
 
+* **팀원 필수 세팅:**
+  1. 로컬 PC에 MySQL을 설치하고 실행합니다.
+  2. MySQL에 접속하여 빈 데이터베이스(예: `javaproject`)를 딱 하나만 생성해 둡니다. (테이블은 직접 만들 필요가 없습니다!)
+  3. `context-datasource.xml` 또는 `globals.properties` 파일에 본인 PC의 MySQL 접속 계정(ID/PW)을 맞게 설정합니다.
 
+### 🦅 Flyway (DB 마이그레이션 도구)
+Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하는(CREATE TABLE, ALTER, DROP) '자동 정의'입니다. 
 
+팀원들이 이클립스에서 톰캣(Tomcat) 서버를 켜는 순간, Flyway가 자동으로 작동하여 최신 DB 구조를 각자의 PC에 똑같이 세팅해 줍니다. 따라서 테이블이 없거나 구조가 달라서 에러가 나는 일이 발생하지 않습니다.
+
+* **작동 원리:**
+  * 프로젝트의 `src/main/resources/db/migration` 폴더에 있는 SQL 파일들을 버전(`V1`, `V2`...) 순서대로 읽어서 자동으로 실행합니다.
+  * 이미 실행된 버전은 Flyway가 자체적으로 기억(History)하여 중복 실행하지 않고, 새롭게 추가된 버전의 SQL 파일만 똑똑하게 실행합니다.
+
+---
+
+### 🚨 [중요] DB 테이블 구조를 변경(추가/수정)할 때 규칙
+
+**기존에 작성된 V1, V2 파일은 절대! 네버! 수정하거나 삭제하지 마세요.**
+(과거의 파일을 수정하면 Flyway의 기억 장부와 충돌하여 서버가 켜지지 않습니다.)
+
+테이블에 컬럼을 추가하거나 새로운 테이블을 만들어야 한다면, **반드시 새로운 버전의 SQL 파일을 생성**해야 합니다.
+
+**[SQL 파일 네이밍 규칙]**
+1. 파일 위치: `src/main/resources/db/migration`
+2. 파일 이름: `V숫자__설명.sql` (반드시 **대문자 V** + **숫자** + **언더바 2개(__)** 형식 준수)
+3. 예시:
+   * `V1__init.sql` (최초 테이블 생성)
+   * `V2__add_email_to_member.sql` (회원 테이블에 이메일 컬럼 추가 시)
+   * `V3__create_board_table.sql` (게시판 테이블 신규 생성 시)
+
+새로운 `V숫자__xxx.sql` 파일을 만들고 깃허브에 올리면(Push), 다른 팀원들은 코드를 내려받고(Pull) 서버를 켜기만 하면 자동으로 본인 PC의 DB에 해당 변경사항이 적용됩니다.
+
+## ⚙️ 서버 구동 및 초기 데이터 자동 세팅 흐름
+
+우리 프로젝트는 개발 편의성과 보안을 모두 챙기기 위해, 톰캣(Tomcat) 서버가 켜질 때 다음과 같은 순서로 초기 데이터가 자동 세팅됩니다. 
+
+**[자동 세팅 프로세스 4단계]**
+
+1️⃣ **Tomcat 서버 시작**
+2️⃣ **Flyway 실행 (테이블 및 일반 데이터 구축)**
+   * `db/migration` 폴더의 SQL 파일들을 읽어 테이블을 자동 생성합니다.
+   * ⚠️ **[데이터 추가 규칙 1]** 상품, 부서, 공통 코드 등 **보안(암호화)이 필요 없는 샘플 데이터**는 무조건 이 SQL 파일 안에 `INSERT` 문으로 작성해 주세요.
+3️⃣ **DataInitializer 실행 (보안 데이터 구축)**
+   * **위치:** `src/main/java/egovframework/common/DataInitializer.java`
+   * Flyway 실행 직후, Spring의 `@PostConstruct`를 통해 자동으로 Java 코드가 실행됩니다.
+   * ⚠️ **[데이터 추가 규칙 2]** 회원 정보 등 **비밀번호(BCrypt) 암호화가 필수적인 민감 데이터**는 절대 SQL 파일에 평문으로 넣지 말고, 반드시 이 `DataInitializer.java` 파일 안에서 암호화 처리 후 삽입해 주세요.
+4️⃣ **구동 완료 및 즉시 로그인 가능!**
+   * 서버 구동이 완료되면, 추가 설정 없이 즉시 아래의 기본 관리자 계정으로 테스트 로그인이 가능합니다.
+   * **테스트 계정:** `admin` / **비밀번호:** `1234`
