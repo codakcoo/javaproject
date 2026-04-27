@@ -185,16 +185,20 @@ Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하는(CREATE TABLE,
 **[자동 세팅 프로세스 4단계]**
 
 1️⃣ **Tomcat 서버 시작**
+<br>
 2️⃣ **Flyway 실행 (테이블 및 일반 데이터 구축)**
    * `db/migration` 폴더의 SQL 파일들을 읽어 테이블을 자동 생성합니다.
    * ⚠️ **[데이터 추가 규칙 1]** 상품, 부서, 공통 코드 등 **보안(암호화)이 필요 없는 샘플 데이터**는 무조건 이 SQL 파일 안에 `INSERT` 문으로 작성해 주세요.
+<br>
 3️⃣ **DataInitializer 실행 (보안 데이터 구축)**
    * **위치:** `src/main/java/egovframework/common/DataInitializer.java`
    * Flyway 실행 직후, Spring의 `@PostConstruct`를 통해 자동으로 Java 코드가 실행됩니다.
    * ⚠️ **[데이터 추가 규칙 2]** 회원 정보 등 **비밀번호(BCrypt) 암호화가 필수적인 민감 데이터**는 절대 SQL 파일에 평문으로 넣지 말고, 반드시 이 `DataInitializer.java` 파일 안에서 암호화 처리 후 삽입해 주세요.
+<br>
 4️⃣ **구동 완료 및 즉시 로그인 가능!**
    * 서버 구동이 완료되면, 추가 설정 없이 즉시 아래의 기본 관리자 계정으로 테스트 로그인이 가능합니다.
    * **테스트 계정:** `admin` / **비밀번호:** `1234`
+<br>
 
 <h5>데이터베이스 및 Flyway 기록 지우는 코드 파일</h5>
 https://drive.google.com/file/d/1Emn3SaxibJcXvYJKtrJVO5TvADaC-0PM/view?usp=drive_link
