@@ -60,7 +60,7 @@ sequenceDiagram
 <p>가져온 폴더 안으로 이동(cd javaproject)한 후, 내 작업방을 만들고 이동합니다.</p>
 <p>최신 상태 업데이트 후, 새로운 브랜치 생성 및 이동</p>
 <p>git pull origin main</p>
-<p>git checkout -b feature/내기능이름</p>
+<p>git checkout -b 자신이지정할브랜치이름</p>
 
 <br>
 <h4>[3단계] 코드 저장 및 업로드</h4>
@@ -194,11 +194,10 @@ Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하는(CREATE TABLE,
    * **위치:** `src/main/java/egovframework/common/DataInitializer.java`
    * Flyway 실행 직후, Spring의 `@PostConstruct`를 통해 자동으로 Java 코드가 실행됩니다.
    * ⚠️ **[데이터 추가 규칙 2]** 회원 정보 등 **비밀번호(BCrypt) 암호화가 필수적인 민감 데이터**는 절대 SQL 파일에 평문으로 넣지 말고, 반드시 이 `DataInitializer.java` 파일 안에서 암호화 처리 후 삽입해 주세요.
-<br>
 4️⃣ **구동 완료 및 즉시 로그인 가능!**
    * 서버 구동이 완료되면, 추가 설정 없이 즉시 아래의 기본 관리자 계정으로 테스트 로그인이 가능합니다.
    * **테스트 계정:** `admin` / **비밀번호:** `1234`
 <br>
 
 <h5>데이터베이스 및 Flyway 기록 지우는 코드 파일</h5>
-https://drive.google.com/file/d/1Emn3SaxibJcXvYJKtrJVO5TvADaC-0PM/view?usp=drive_link
+https://drive.google.com/file/d/1iUmnTNMYtp8U5IakJPACHnHa-y75s-9V/view?usp=drive_link
