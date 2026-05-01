@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 @Component
-@DependsOn("flyway")
+//@DependsOn("flyway")
 public class DataInitializer {
 
     @Autowired

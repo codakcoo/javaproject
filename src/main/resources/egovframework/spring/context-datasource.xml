@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-        http://www.springframework.org/schema/jdbc  http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 	
 	<!-- 테스트 실행용 
 	<jdbc:embedded-database id="dataSource" type="HSQL">
@@ -21,22 +25,26 @@
     
     <!-- Mysql (POM에서 commons-dbcp, mysql-connector-java 관련 라이브러리 설정 ) 
     -->
+    <context:property-placeholder location="classpath:/db.properties"/>
+    
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-	    <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-	    <property name="url" value="jdbc:mysql://127.0.0.1:3306/javaproject?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul"/>
-	    <property name="username" value="root"/>
-	    <property name="password" value="1234"/>
-	</bean>
-	<!-- flyway (DB 연결 설정) -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url"      value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
+	<!-- flyway (DB 연결 설정) 
 	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
 	    <property name="dataSource" ref="dataSource" />
-	    <property name="baselineOnMigrate" value="false" />
+	    <property name="baselineOnMigrate" value="true" />
+	    <property name="baselineVersion" value="0" />
 	    <property name="locations" value="classpath:db/migration" />
 	</bean>
 
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
     	<constructor-arg ref="flywayConfig" />
 	</bean>
+	-->
     
     <!-- oracle (POM에서 commons-dbcp, ojdbc(라이센스 사항으로 별도로 배포되지 않음) 관련 라이브러리 설정)
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
