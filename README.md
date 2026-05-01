@@ -1,11 +1,11 @@
 <h1>자바 프로젝트</h1>
 
-
+팀 메모: https://teams.cloud.microsoft/
 <p><strong>버전</strong>: 전자정부프레임워크 4.3</p>
 <p><strong>모델</strong>: MVC2</p>
 <p><strong>서버</strong>: Tomcat 9.0v</p>
 <p><strong>DB</strong>:   MySQL</p>
-<p><strong>DB초기 설정</strong>: Flyway(8.5.13)</p>
+**폐기<p><strong>DB초기 설정</strong>: Flyway(8.5.13)</p>**
 <hr style="border: 0; height: 2px; background: black; width: 50%;">
 
 <h2>Java/Spring MVC2 팀 프로젝트 협업 가이드</h2>
@@ -182,6 +182,10 @@ Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하는(CREATE TABLE,
 
 우리 프로젝트는 개발 편의성과 보안을 모두 챙기기 위해, 톰캣(Tomcat) 서버가 켜질 때 다음과 같은 순서로 초기 데이터가 자동 세팅됩니다. 
 
+
+
+
+**폐기**
 **[자동 세팅 프로세스 4단계]**
 
 1️⃣ **Tomcat 서버 시작**
@@ -198,6 +202,31 @@ Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하는(CREATE TABLE,
    * 서버 구동이 완료되면, 추가 설정 없이 즉시 아래의 기본 관리자 계정으로 테스트 로그인이 가능합니다.
    * **테스트 계정:** `admin` / **비밀번호:** `1234`
 <br>
+
+## 🗄️ 5. 데이터베이스(DB) 세팅 (공용 NAS DB 사용)
+
+우리 프로젝트는 로컬 DB 동기화의 번거로움을 없애고 완벽한 데이터 일치를 위해 **공용 NAS DB(MySQL)** 를 도입하여 사용합니다. 팀원 모두가 동일한 원격 DB를 바라보므로 개인 PC에 별도의 DB 세팅이 필요 없습니다!
+
+* **팀원 필수 세팅:**
+  1. `context-datasource.xml` 또는 `globals.properties` 파일의 DB 접속 주소(`url`)와 계정(ID/PW)을 **NAS DB 접속 정보**로 변경합니다. (보안상 깃허브에는 올리지 않고 팀 노트에서 따로 공유합니다.)
+  2. 테이블 생성, 컬럼 수정 등의 DDL 작업은 팀장(또는 DB 관리자)이 NAS DB에 직접 접속하여 반영합니다.
+
+<br>
+---
+
+### ⛔ [Deprecated] Flyway (DB 마이그레이션 도구) - NAS DB 연동으로 인한 사용 폐기
+
+~~Flyway는 빈 건물(MySQL)에 들어가서 책상을 세팅하고(CREATE TABLE) 서류를 넣어주는(INSERT) '자동 인테리어 업체'입니다.~~
+
+~~팀원들이 이클립스에서 톰캣(Tomcat) 서버를 켜는 순간, Flyway가 자동으로 작동하여 최신 DB 구조를 각자의 PC에 똑같이 세팅해 줍니다. 따라서 테이블이 없거나 구조가 달라서 에러가 나는 일이 발생하지 않습니다.~~
+
+~~* **작동 원리:**~~
+  ~~* 프로젝트의 `src/main/resources/db/migration` 폴더에 있는 SQL 파일들을 버전(`V1`, `V2`...) 순서대로 읽어서 자동으로 실행합니다.~~
+  ~~* 이미 실행된 버전은 Flyway가 자체적으로 기억(History)하여 중복 실행하지 않고, 새롭게 추가된 버전의 SQL 파일만 똑똑하게 실행합니다.~~
+
+~~**🚨 [중요] DB 테이블 구조를 변경(추가/수정)할 때 규칙**~~
+~~기존에 작성된 V1, V2 파일은 절대 수정하거나 삭제하지 마세요.~~
+~~테이블에 컬럼을 추가하거나 새로운 테이블을 만들어야 한다면, 반드시 새로운 버전의 SQL 파일(`V숫자__설명.sql`)을 생성해야 합니다.~~
 
 <h5>데이터베이스 및 Flyway 기록 지우는 코드 파일</h5>
 https://drive.google.com/file/d/1iUmnTNMYtp8U5IakJPACHnHa-y75s-9V/view?usp=drive_link
