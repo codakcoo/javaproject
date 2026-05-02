@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.inventory.mapper.InventoryMapper">
+
+    <resultMap id="inventoryResultMap" type="egovframework.inventory.vo.InventoryVO">
+        <id     property="inventoryId"   column="inventory_id"/>
+        <result property="productId"     column="product_id"/>
+        <result property="warehouseId"   column="warehouse_id"/>
+        <result property="qtyOnHand"     column="qty_on_hand"/>
+        <result property="qtyReserved"   column="qty_reserved"/>
+        <result property="lotNo"         column="lot_no"/>
+        <result property="expiryDate"    column="expiry_date"/>
+        <result property="lastUpdated"   column="last_updated"/>
+        <!-- 조인 -->
+        <result property="productCode"   column="product_code"/>
+        <result property="productName"   column="product_name"/>
+        <result property="unit"          column="unit"/>
+        <result property="reorderPoint"  column="reorder_point"/>
+        <result property="warehouseCode" column="warehouse_code"/>
+        <result property="warehouseName" column="warehouse_name"/>
+    </resultMap>
+
+    <!-- 재고 현황 목록 (PRODUCT, WAREHOUSE 조인) -->
+    <select id="selectInventoryList" parameterType="egovframework.inventory.vo.InventoryVO"
+            resultMap="inventoryResultMap">
+        SELECT i.inventory_id, i.product_id, i.warehouse_id,
+               i.qty_on_hand, i.qty_reserved, i.lot_no, i.expiry_date,
+               DATE_FORMAT(i.last_updated, '%Y-%m-%d %H:%i') AS last_updated,
+               p.product_code, p.product_name, p.unit, p.reorder_point,
+               w.warehouse_code, w.warehouse_name
+        FROM   INVENTORY i
+        INNER JOIN PRODUCT   p ON i.product_id   = p.product_id
+        INNER JOIN WAREHOUSE w ON i.warehouse_id = w.warehouse_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (p.product_name LIKE CONCAT('%', #{keyword}, '%')
+                  OR p.product_code LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="warehouseId != null">
+                AND i.warehouse_id = #{warehouseId}
+            </if>
+            <if test="warehouseType != null and warehouseType != ''">
+                AND w.type = #{warehouseType}
+            </if>
+        </where>
+        ORDER BY p.product_code, w.warehouse_code
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectInventory" parameterType="long" resultMap="inventoryResultMap">
+        SELECT i.inventory_id, i.product_id, i.warehouse_id,
+               i.qty_on_hand, i.qty_reserved, i.lot_no, i.expiry_date,
+               DATE_FORMAT(i.last_updated, '%Y-%m-%d %H:%i') AS last_updated,
+               p.product_code, p.product_name, p.unit, p.reorder_point,
+               w.warehouse_code, w.warehouse_name
+        FROM   INVENTORY i
+        INNER JOIN PRODUCT   p ON i.product_id   = p.product_id
+        INNER JOIN WAREHOUSE w ON i.warehouse_id = w.warehouse_id
+        WHERE  i.inventory_id = #{inventoryId}
+    </select>
+
+    <!--
+        입출고 처리 시 재고 upsert
+        - 해당 product+warehouse 조합이 없으면 INSERT
+        - 있으면 qty_on_hand만 delta 만큼 UPDATE
+        qty 파라미터: 입고=+값, 출고=-값
+    -->
+    <insert id="upsertInventory" parameterType="egovframework.inventory.vo.InventoryVO">
+        INSERT INTO INVENTORY (product_id, warehouse_id, qty_on_hand, qty_reserved, lot_no, expiry_date)
+        VALUES (#{productId}, #{warehouseId}, #{qtyOnHand}, 0, #{lotNo}, #{expiryDate})
+        ON DUPLICATE KEY UPDATE
+            qty_on_hand  = qty_on_hand + #{qtyOnHand},
+            last_updated = NOW()
+    </insert>
+
+</mapper>

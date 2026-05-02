@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.stock.mapper.StockMovementMapper">
+
+    <resultMap id="movementResultMap" type="egovframework.stock.vo.StockMovementVO">
+        <id     property="movementId"    column="movement_id"/>
+        <result property="productId"     column="product_id"/>
+        <result property="warehouseId"   column="warehouse_id"/>
+        <result property="movementType"  column="movement_type"/>
+        <result property="qty"           column="qty"/>
+        <result property="unitCost"      column="unit_cost"/>
+        <result property="refOrderId"    column="ref_order_id"/>
+        <result property="refOrderType"  column="ref_order_type"/>
+        <result property="remarks"       column="remarks"/>
+        <result property="createdBy"     column="created_by"/>
+        <result property="createdAt"     column="created_at"/>
+        <!-- 조인 -->
+        <result property="productCode"   column="product_code"/>
+        <result property="productName"   column="product_name"/>
+        <result property="unit"          column="unit"/>
+        <result property="warehouseCode" column="warehouse_code"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="createdByName" column="created_by_name"/>
+    </resultMap>
+
+    <!-- 이력 목록 -->
+    <select id="selectMovementList" parameterType="egovframework.stock.vo.StockMovementVO"
+            resultMap="movementResultMap">
+        SELECT sm.movement_id, sm.product_id, sm.warehouse_id,
+               sm.movement_type, sm.qty, sm.unit_cost,
+               sm.ref_order_id, sm.ref_order_type, sm.remarks,
+               sm.created_by, DATE_FORMAT(sm.created_at, '%Y-%m-%d %H:%i') AS created_at,
+               p.product_code, p.product_name, p.unit,
+               w.warehouse_code, w.warehouse_name,
+               m.name AS created_by_name
+        FROM   STOCK_MOVEMENT sm
+        INNER JOIN PRODUCT   p ON sm.product_id   = p.product_id
+        INNER JOIN WAREHOUSE w ON sm.warehouse_id = w.warehouse_id
+        INNER JOIN member    m ON sm.created_by   = m.member_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (p.product_name LIKE CONCAT('%', #{keyword}, '%')
+                  OR p.product_code LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="movementType != null and movementType != ''">
+                AND sm.movement_type = #{movementType}
+            </if>
+            <if test="warehouseId != null">
+                AND sm.warehouse_id = #{warehouseId}
+            </if>
+            <if test="fromDate != null and fromDate != ''">
+                AND DATE(sm.created_at) >= #{fromDate}
+            </if>
+            <if test="toDate != null and toDate != ''">
+                AND DATE(sm.created_at) &lt;= #{toDate}
+            </if>
+        </where>
+        ORDER BY sm.movement_id DESC
+    </select>
+
+    <!-- 단건 -->
+    <select id="selectMovement" parameterType="long" resultMap="movementResultMap">
+        SELECT sm.movement_id, sm.product_id, sm.warehouse_id,
+               sm.movement_type, sm.qty, sm.unit_cost,
+               sm.ref_order_id, sm.ref_order_type, sm.remarks,
+               sm.created_by, DATE_FORMAT(sm.created_at, '%Y-%m-%d %H:%i') AS created_at,
+               p.product_code, p.product_name, p.unit,
+               w.warehouse_code, w.warehouse_name,
+               m.name AS created_by_name
+        FROM   STOCK_MOVEMENT sm
+        INNER JOIN PRODUCT   p ON sm.product_id   = p.product_id
+        INNER JOIN WAREHOUSE w ON sm.warehouse_id = w.warehouse_id
+        INNER JOIN member    m ON sm.created_by   = m.member_id
+        WHERE  sm.movement_id = #{movementId}
+    </select>
+
+    <!-- 이력 등록 (append-only) -->
+    <insert id="insertMovement" parameterType="egovframework.stock.vo.StockMovementVO"
+            useGeneratedKeys="true" keyProperty="movementId">
+        INSERT INTO STOCK_MOVEMENT
+               (product_id, warehouse_id, movement_type, qty, unit_cost,
+                ref_order_id, ref_order_type, remarks, created_by, created_at)
+        VALUES (#{productId}, #{warehouseId}, #{movementType}, #{qty}, #{unitCost},
+                #{refOrderId}, #{refOrderType}, #{remarks}, #{createdBy}, NOW())
+    </insert>
+
+</mapper>
