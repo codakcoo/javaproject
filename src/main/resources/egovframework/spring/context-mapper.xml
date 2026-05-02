@@ -10,7 +10,7 @@
     </bean>
 
     <bean class="org.egovframe.rte.psl.dataaccess.mapper.MapperConfigurer">
-        <property name="basePackage" value="egovframework.member.mapper" />
+        <property name="basePackage" value="egovframework.member.mapper,egovframework.product.mapper" />
     </bean>
 
 </beans>
