@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.warehouse.mapper.WarehouseMapper">
+
+    <resultMap id="warehouseResultMap" type="egovframework.warehouse.vo.WarehouseVO">
+        <id     property="warehouseId"   column="warehouse_id"/>
+        <result property="warehouseCode" column="warehouse_code"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="location"      column="location"/>
+        <result property="type"          column="type"/>
+        <result property="isActive"      column="is_active"/>
+    </resultMap>
+
+    <select id="selectWarehouseList" parameterType="egovframework.warehouse.vo.WarehouseVO"
+            resultMap="warehouseResultMap">
+        SELECT warehouse_id, warehouse_code, warehouse_name, location, type, is_active
+        FROM   WAREHOUSE
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (warehouse_name LIKE CONCAT('%', #{keyword}, '%')
+                  OR warehouse_code LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+        ORDER BY warehouse_id ASC
+    </select>
+
+    <select id="selectWarehouse" parameterType="long" resultMap="warehouseResultMap">
+        SELECT warehouse_id, warehouse_code, warehouse_name, location, type, is_active
+        FROM   WAREHOUSE WHERE warehouse_id = #{warehouseId}
+    </select>
+
+    <insert id="insertWarehouse" parameterType="egovframework.warehouse.vo.WarehouseVO"
+            useGeneratedKeys="true" keyProperty="warehouseId">
+        INSERT INTO WAREHOUSE (warehouse_code, warehouse_name, location, type, is_active)
+        VALUES (#{warehouseCode}, #{warehouseName}, #{location}, #{type}, 1)
+    </insert>
+
+    <update id="updateWarehouse" parameterType="egovframework.warehouse.vo.WarehouseVO">
+        UPDATE WAREHOUSE
+        SET    warehouse_name = #{warehouseName},
+               location       = #{location},
+               type           = #{type},
+               is_active      = #{isActive}
+        WHERE  warehouse_id = #{warehouseId}
+    </update>
+
+    <update id="deleteWarehouse" parameterType="long">
+        UPDATE WAREHOUSE SET is_active = 0 WHERE warehouse_id = #{warehouseId}
+    </update>
+
+</mapper>
