@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.product.mapper.ProductMapper">
+
+    <!-- ResultMap -->
+    <resultMap id="productResultMap" type="egovframework.product.vo.ProductVO">
+        <id     property="productId"      column="product_id"/>
+        <result property="productCode"    column="product_code"/>
+        <result property="productName"    column="product_name"/>
+        <result property="category"       column="category"/>
+        <result property="unit"           column="unit"/>
+        <result property="reorderPoint"   column="reorder_point"/>
+        <result property="reorderQty"     column="reorder_qty"/>
+        <result property="unitCost"       column="unit_cost"/>
+        <result property="isActive"       column="is_active"/>
+        <result property="createdAt"      column="created_at"/>
+        <result property="qtyOnHand"      column="qty_on_hand"/>
+        <result property="qtyReserved"    column="qty_reserved"/>
+        <result property="warehouseName"  column="warehouse_name"/>
+        <result property="warehouseId"    column="warehouse_id"/>
+    </resultMap>
+
+    <resultMap id="salesResultMap" type="egovframework.product.vo.SalesVO">
+        <id     property="soId"           column="so_id"/>
+        <result property="soNo"           column="so_no"/>
+        <result property="customerId"     column="customer_id"/>
+        <result property="customerName"   column="customer_name"/>
+        <result property="orderDate"      column="order_date"/>
+        <result property="deliveryDate"   column="delivery_date"/>
+        <result property="status"         column="status"/>
+        <result property="createdBy"      column="created_by"/>
+        <result property="createdAt"      column="created_at"/>
+    </resultMap>
+
+    <!-- ============================================================ -->
+    <!--  상품 관리                                                      -->
+    <!-- ============================================================ -->
+    <select id="selectProductList" parameterType="egovframework.product.vo.ProductVO"
+            resultMap="productResultMap">
+        SELECT product_id, product_code, product_name, category, unit,
+               reorder_point, reorder_qty, unit_cost, is_active, created_at
+        FROM   PRODUCT
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchCategory != null and searchCategory != ''">
+                AND category = #{searchCategory}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectProductCount" parameterType="egovframework.product.vo.ProductVO"
+            resultType="int">
+        SELECT COUNT(*) FROM PRODUCT
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchCategory != null and searchCategory != ''">
+                AND category = #{searchCategory}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectProduct" parameterType="Long" resultMap="productResultMap">
+        SELECT product_id, product_code, product_name, category, unit,
+               reorder_point, reorder_qty, unit_cost, is_active, created_at
+        FROM   PRODUCT
+        WHERE  product_id = #{productId}
+    </select>
+
+    <insert id="insertProduct" parameterType="egovframework.product.vo.ProductVO"
+            useGeneratedKeys="true" keyProperty="productId">
+        INSERT INTO PRODUCT (product_code, product_name, category, unit,
+                             reorder_point, reorder_qty, unit_cost, is_active)
+        VALUES (#{productCode}, #{productName}, #{category}, #{unit},
+                #{reorderPoint}, #{reorderQty}, #{unitCost}, #{isActive})
+    </insert>
+
+    <update id="updateProduct" parameterType="egovframework.product.vo.ProductVO">
+        UPDATE PRODUCT
+        SET product_code  = #{productCode},
+            product_name  = #{productName},
+            category      = #{category},
+            unit          = #{unit},
+            reorder_point = #{reorderPoint},
+            reorder_qty   = #{reorderQty},
+            unit_cost     = #{unitCost},
+            is_active     = #{isActive}
+        WHERE product_id = #{productId}
+    </update>
+
+    <delete id="deleteProduct" parameterType="Long">
+        DELETE FROM PRODUCT WHERE product_id = #{productId}
+    </delete>
+
+    <!-- ============================================================ -->
+    <!--  판매 현황 (SALES_ORDER)                                        -->
+    <!-- ============================================================ -->
+    <select id="selectSalesList" parameterType="egovframework.product.vo.SalesVO"
+            resultMap="salesResultMap">
+        SELECT s.so_id, s.so_no, s.customer_id, c.customer_name,
+               DATE_FORMAT(s.order_date, '%Y-%m-%d')    AS order_date,
+               DATE_FORMAT(s.delivery_date, '%Y-%m-%d') AS delivery_date,
+               s.status, s.created_by,
+               DATE_FORMAT(s.created_at, '%Y-%m-%d')    AS created_at
+        FROM   SALES_ORDER s
+        LEFT JOIN CUSTOMER c ON s.customer_id = c.customer_id
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (c.customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR s.so_no         LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchStatus != null and searchStatus != ''">
+                AND s.status = #{searchStatus}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND s.order_date &gt;= #{dateFrom}
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND s.order_date &lt;= #{dateTo}
+            </if>
+        </where>
+        ORDER BY s.created_at DESC
+    </select>
+
+    <select id="selectSalesCount" parameterType="egovframework.product.vo.SalesVO"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM   SALES_ORDER s
+        LEFT JOIN CUSTOMER c ON s.customer_id = c.customer_id
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (c.customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR s.so_no         LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchStatus != null and searchStatus != ''">
+                AND s.status = #{searchStatus}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND s.order_date &gt;= #{dateFrom}
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND s.order_date &lt;= #{dateTo}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertSales" parameterType="egovframework.product.vo.SalesVO"
+            useGeneratedKeys="true" keyProperty="soId">
+        INSERT INTO SALES_ORDER (so_no, customer_id, order_date, delivery_date, status, created_by)
+        VALUES (#{soNo}, #{customerId}, #{orderDate}, #{deliveryDate}, #{status}, #{createdBy})
+    </insert>
+
+    <!-- ============================================================ -->
+    <!--  재고 현황 (INVENTORY JOIN PRODUCT + WAREHOUSE)                 -->
+    <!-- ============================================================ -->
+    <select id="selectStockList" parameterType="egovframework.product.vo.ProductVO"
+            resultMap="productResultMap">
+        SELECT p.product_id, p.product_code, p.product_name, p.category, p.unit,
+               p.reorder_point, p.unit_cost, p.is_active,
+               IFNULL(i.qty_on_hand, 0)   AS qty_on_hand,
+               IFNULL(i.qty_reserved, 0)  AS qty_reserved,
+               w.warehouse_name, w.warehouse_id
+        FROM   PRODUCT p
+        LEFT JOIN INVENTORY i  ON p.product_id   = i.product_id
+        LEFT JOIN WAREHOUSE  w ON i.warehouse_id  = w.warehouse_id
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR p.product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchCategory != null and searchCategory != ''">
+                AND p.category = #{searchCategory}
+            </if>
+        </where>
+        ORDER BY
+            CASE WHEN IFNULL(i.qty_on_hand, 0) &lt;= p.reorder_point THEN 0 ELSE 1 END,
+            i.qty_on_hand ASC
+    </select>
+
+    <select id="selectStockCount" parameterType="egovframework.product.vo.ProductVO"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM   PRODUCT p
+        LEFT JOIN INVENTORY i ON p.product_id = i.product_id
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR p.product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchCategory != null and searchCategory != ''">
+                AND p.category = #{searchCategory}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateStock" parameterType="egovframework.product.vo.ProductVO">
+        UPDATE INVENTORY
+        SET qty_on_hand = #{qtyOnHand}
+        WHERE product_id   = #{productId}
+          AND warehouse_id = #{warehouseId}
+    </update>
+
+    <!-- ============================================================ -->
+    <!--  대시보드                                                        -->
+    <!-- ============================================================ -->
+    <select id="selectTotalProductCount" resultType="int">
+        SELECT COUNT(*) FROM PRODUCT WHERE is_active = 1
+    </select>
+
+    <select id="selectLowStockCount" resultType="int">
+        SELECT COUNT(*)
+        FROM   PRODUCT p
+        JOIN   INVENTORY i ON p.product_id = i.product_id
+        WHERE  i.qty_on_hand &lt;= p.reorder_point
+          AND  p.is_active = 1
+    </select>
+
+</mapper>

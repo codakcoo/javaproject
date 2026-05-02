@@ -1,0 +1,33 @@
+package egovframework.product.mapper;
+
+import egovframework.product.vo.ProductVO;
+import egovframework.product.vo.SalesVO;
+import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
+
+import java.util.List;
+
+@Mapper
+public interface ProductMapper {
+
+    // 상품 관리
+    List<ProductVO> selectProductList(ProductVO vo);
+    ProductVO       selectProduct(Long productId);
+    int             selectProductCount(ProductVO vo);
+    void            insertProduct(ProductVO vo);
+    void            updateProduct(ProductVO vo);
+    void            deleteProduct(Long productId);
+
+    // 판매 현황 (SALES_ORDER)
+    List<SalesVO>   selectSalesList(SalesVO vo);
+    int             selectSalesCount(SalesVO vo);
+    void            insertSales(SalesVO vo);
+
+    // 재고 현황 (INVENTORY JOIN)
+    List<ProductVO> selectStockList(ProductVO vo);
+    int             selectStockCount(ProductVO vo);
+    void            updateStock(ProductVO vo);
+
+    // 대시보드
+    int             selectTotalProductCount();
+    int             selectLowStockCount();
+}
