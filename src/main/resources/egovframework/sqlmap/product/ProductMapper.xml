@@ -224,6 +224,9 @@
         WHERE  i.qty_on_hand &lt;= p.reorder_point
           AND  p.is_active = 1
           AND  w.type != 'DEFECT'
+        JOIN   INVENTORY i ON p.product_id = i.product_id
+        WHERE  i.qty_on_hand &lt;= p.reorder_point
+          AND  p.is_active = 1
     </select>
 
 </mapper>
