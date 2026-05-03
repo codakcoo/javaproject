@@ -217,6 +217,7 @@
         LEFT JOIN INVENTORY i  ON p.product_id  = i.product_id
         LEFT JOIN WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
         <where>
+            AND (w.type IS NULL OR w.type != 'DEFECT')
             <if test="searchKeyword != null and searchKeyword != ''">
                 AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
                   OR p.product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
@@ -267,6 +268,8 @@
         FROM   PRODUCT p
         JOIN   INVENTORY i  ON p.product_id  = i.product_id
         JOIN   WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
+        JOIN   INVENTORY i  ON p.product_id   = i.product_id
+        JOIN   WAREHOUSE  w ON i.warehouse_id  = w.warehouse_id
         WHERE  i.qty_on_hand &lt;= p.reorder_point
           AND  p.is_active = 1
           AND  w.type != 'DEFECT'
