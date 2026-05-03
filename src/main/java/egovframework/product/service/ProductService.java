@@ -16,8 +16,14 @@ public interface ProductService {
     int             getSalesCount(SalesVO vo);
     void            addSales(SalesVO vo);
 
+    // 불량창고 제외
     List<ProductVO> getStockList(ProductVO vo);
     int             getStockCount(ProductVO vo);
+
+    // 불량창고 포함 전체
+    List<ProductVO> getStockListAll(ProductVO vo);
+    int             getStockCountAll(ProductVO vo);
+
     void            modifyStock(ProductVO vo);
 
     int             getTotalProductCount();

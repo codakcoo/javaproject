@@ -22,9 +22,14 @@ public interface ProductMapper {
     int             selectSalesCount(SalesVO vo);
     void            insertSales(SalesVO vo);
 
-    // 재고 현황 (INVENTORY JOIN)
+    // 재고 현황 (INVENTORY JOIN) - 불량창고 제외
     List<ProductVO> selectStockList(ProductVO vo);
     int             selectStockCount(ProductVO vo);
+
+    // 재고 현황 (INVENTORY JOIN) - 불량창고 포함 전체
+    List<ProductVO> selectStockListAll(ProductVO vo);
+    int             selectStockCountAll(ProductVO vo);
+
     void            updateStock(ProductVO vo);
 
     // 대시보드

@@ -27,6 +27,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override public List<ProductVO> getStockList(ProductVO vo)   { return productMapper.selectStockList(vo); }
     @Override public int             getStockCount(ProductVO vo)  { return productMapper.selectStockCount(vo); }
+
+    @Override public List<ProductVO> getStockListAll(ProductVO vo) { return productMapper.selectStockListAll(vo); }
+    @Override public int             getStockCountAll(ProductVO vo){ return productMapper.selectStockCountAll(vo); }
+
     @Override public void            modifyStock(ProductVO vo)    { productMapper.updateStock(vo); }
 
     @Override public int             getTotalProductCount()       { return productMapper.selectTotalProductCount(); }
