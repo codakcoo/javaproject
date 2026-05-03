@@ -20,6 +20,7 @@
         <result property="qtyReserved"    column="qty_reserved"/>
         <result property="warehouseName"  column="warehouse_name"/>
         <result property="warehouseId"    column="warehouse_id"/>
+        <result property="warehouseType"  column="warehouse_type"/>
     </resultMap>
 
     <resultMap id="salesResultMap" type="egovframework.product.vo.SalesVO">
@@ -159,7 +160,7 @@
     </insert>
 
     <!-- ============================================================ -->
-    <!--  재고 현황 (INVENTORY JOIN PRODUCT + WAREHOUSE)                 -->
+    <!--  재고 현황 - 불량창고 제외 (기본)                                  -->
     <!-- ============================================================ -->
     <select id="selectStockList" parameterType="egovframework.product.vo.ProductVO"
             resultMap="productResultMap">
@@ -167,10 +168,54 @@
                p.reorder_point, p.unit_cost, p.is_active,
                IFNULL(i.qty_on_hand, 0)   AS qty_on_hand,
                IFNULL(i.qty_reserved, 0)  AS qty_reserved,
-               w.warehouse_name, w.warehouse_id
+               w.warehouse_name, w.warehouse_id,
+               w.type                     AS warehouse_type
         FROM   PRODUCT p
-        LEFT JOIN INVENTORY i  ON p.product_id   = i.product_id
-        LEFT JOIN WAREHOUSE  w ON i.warehouse_id  = w.warehouse_id
+        LEFT JOIN INVENTORY i  ON p.product_id  = i.product_id
+        LEFT JOIN WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
+        WHERE  (w.type IS NULL OR w.type != 'DEFECT')
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR p.product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+        </if>
+        <if test="searchCategory != null and searchCategory != ''">
+            AND p.category = #{searchCategory}
+        </if>
+        ORDER BY
+            CASE WHEN IFNULL(i.qty_on_hand, 0) &lt;= p.reorder_point THEN 0 ELSE 1 END,
+            i.qty_on_hand ASC
+    </select>
+
+    <select id="selectStockCount" parameterType="egovframework.product.vo.ProductVO"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM   PRODUCT p
+        LEFT JOIN INVENTORY i ON p.product_id  = i.product_id
+        LEFT JOIN WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
+        WHERE  (w.type IS NULL OR w.type != 'DEFECT')
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR p.product_code LIKE CONCAT('%', #{searchKeyword}, '%'))
+        </if>
+        <if test="searchCategory != null and searchCategory != ''">
+            AND p.category = #{searchCategory}
+        </if>
+    </select>
+
+    <!-- ============================================================ -->
+    <!--  재고 현황 - 불량창고 포함 전체                                    -->
+    <!-- ============================================================ -->
+    <select id="selectStockListAll" parameterType="egovframework.product.vo.ProductVO"
+            resultMap="productResultMap">
+        SELECT p.product_id, p.product_code, p.product_name, p.category, p.unit,
+               p.reorder_point, p.unit_cost, p.is_active,
+               IFNULL(i.qty_on_hand, 0)   AS qty_on_hand,
+               IFNULL(i.qty_reserved, 0)  AS qty_reserved,
+               w.warehouse_name, w.warehouse_id,
+               w.type                     AS warehouse_type
+        FROM   PRODUCT p
+        LEFT JOIN INVENTORY i  ON p.product_id  = i.product_id
+        LEFT JOIN WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
         <where>
             AND (w.type IS NULL OR w.type != 'DEFECT')
             <if test="searchKeyword != null and searchKeyword != ''">
@@ -182,15 +227,17 @@
             </if>
         </where>
         ORDER BY
+            CASE WHEN w.type = 'DEFECT' THEN 1 ELSE 0 END,
             CASE WHEN IFNULL(i.qty_on_hand, 0) &lt;= p.reorder_point THEN 0 ELSE 1 END,
             i.qty_on_hand ASC
     </select>
 
-    <select id="selectStockCount" parameterType="egovframework.product.vo.ProductVO"
+    <select id="selectStockCountAll" parameterType="egovframework.product.vo.ProductVO"
             resultType="int">
         SELECT COUNT(*)
         FROM   PRODUCT p
-        LEFT JOIN INVENTORY i ON p.product_id = i.product_id
+        LEFT JOIN INVENTORY i ON p.product_id  = i.product_id
+        LEFT JOIN WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
         <where>
             <if test="searchKeyword != null and searchKeyword != ''">
                 AND (p.product_name LIKE CONCAT('%', #{searchKeyword}, '%')
@@ -219,6 +266,8 @@
     <select id="selectLowStockCount" resultType="int">
         SELECT COUNT(*)
         FROM   PRODUCT p
+        JOIN   INVENTORY i  ON p.product_id  = i.product_id
+        JOIN   WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
         JOIN   INVENTORY i  ON p.product_id   = i.product_id
         JOIN   WAREHOUSE  w ON i.warehouse_id  = w.warehouse_id
         WHERE  i.qty_on_hand &lt;= p.reorder_point

@@ -19,10 +19,12 @@ public class ProductVO {
     private double qtyReserved;     // qty_reserved (예약 수량)
     private String warehouseName;   // warehouse_name (창고명)
     private Long   warehouseId;     // warehouse_id
+    private String warehouseType;   // warehouse type (DEFECT 여부 판단용)
 
     // ── 검색 조건 ───────────────────────────────────
     private String searchKeyword;
     private String searchCategory;
+    private String includeDefect;   // "Y" 이면 불량창고 포함 조회
 
     // getters / setters
     public Long   getProductId()              { return productId; }
@@ -53,8 +55,12 @@ public class ProductVO {
     public void   setWarehouseName(String v)  { this.warehouseName = v; }
     public Long   getWarehouseId()            { return warehouseId; }
     public void   setWarehouseId(Long v)      { this.warehouseId = v; }
+    public String getWarehouseType()          { return warehouseType; }
+    public void   setWarehouseType(String v)  { this.warehouseType = v; }
     public String getSearchKeyword()          { return searchKeyword; }
     public void   setSearchKeyword(String v)  { this.searchKeyword = v; }
     public String getSearchCategory()         { return searchCategory; }
     public void   setSearchCategory(String v) { this.searchCategory = v; }
+    public String getIncludeDefect()          { return includeDefect; }
+    public void   setIncludeDefect(String v)  { this.includeDefect = v; }
 }

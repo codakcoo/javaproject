@@ -40,9 +40,13 @@
     .stock-bar-inner { height:100%; border-radius:3px; }
     .bar-safe { background:#10B981; } .bar-low { background:#EF4444; } .bar-warn { background:#F59E0B; }
     .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; }
-    .badge-safe { background:#ECFDF5; color:#059669; }
-    .badge-warn { background:#FFFBEB; color:#D97706; }
-    .badge-low  { background:#FFF1F2; color:#E11D48; }
+    .badge-safe   { background:#ECFDF5; color:#059669; }
+    .badge-warn   { background:#FFFBEB; color:#D97706; }
+    .badge-low    { background:#FFF1F2; color:#E11D48; }
+    .badge-defect { background:#F3F4F6; color:#6B7280; }
+    tbody tr.defect-row { background:#FAFAFA; }
+    tbody tr.defect-row:hover { background:#F3F4F6; }
+    tbody tr.defect-row td { color:#9CA3AF; }
     .btn-edit { background:#EFF6FF; color:#2563EB; border:none; padding:3px 9px; font-size:11px; font-family:inherit; cursor:pointer; font-weight:500; }
     .btn-edit:hover { background:#DBEAFE; }
     .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500; align-items:center; justify-content:center; }
@@ -93,6 +97,12 @@
                 <option value="기타"   ${searchVO.searchCategory eq '기타'   ? 'selected' : ''}>기타</option>
             </select>
             <input type="text" name="searchKeyword" value="${searchVO.searchKeyword}" placeholder="상품명 / 코드 검색">
+            <label style="display:flex; align-items:center; gap:5px; font-size:12px; cursor:pointer; white-space:nowrap;">
+                <input type="checkbox" name="includeDefect" value="Y"
+                       ${searchVO.includeDefect eq 'Y' ? 'checked' : ''}
+                       style="width:auto; height:auto;">
+                불량창고 포함
+            </label>
             <button type="submit" class="btn btn-primary">검색</button>
             <a href="${pageContext.request.contextPath}/stock/list.do" class="btn btn-outline">초기화</a>
         </div>
@@ -121,16 +131,22 @@
                     </c:when>
                     <c:otherwise>
                         <c:forEach var="p" items="${stockList}">
-                            <c:set var="isLow" value="${p.qtyOnHand le p.reorderPoint}"/>
-                            <c:set var="ratio" value="${p.reorderPoint > 0 ? (p.qtyOnHand * 100 / (p.reorderPoint * 2)) : 100}"/>
+                            <c:set var="isLow"    value="${p.qtyOnHand le p.reorderPoint}"/>
+                            <c:set var="isDefect" value="${p.warehouseType eq 'DEFECT'}"/>
+                            <c:set var="ratio"    value="${p.reorderPoint > 0 ? (p.qtyOnHand * 100 / (p.reorderPoint * 2)) : 100}"/>
                             <c:if test="${ratio > 100}"><c:set var="ratio" value="100"/></c:if>
-                            <tr class="${isLow ? 'low-stock' : ''}">
+                            <tr class="${isDefect ? 'defect-row' : (isLow ? 'low-stock' : '')}">
                                 <td><code style="font-size:11px; background:#F1F5F9; padding:2px 5px;">${p.productCode}</code></td>
                                 <td><strong>${p.productName}</strong></td>
                                 <td>${p.category}</td>
                                 <td>${p.unit}</td>
-                                <td style="color:var(--muted)">${empty p.warehouseName ? '-' : p.warehouseName}</td>
-                                <td style="text-align:right; font-weight:700; ${isLow ? 'color:#E11D48;' : 'color:#059669;'}">
+                                <td style="color:var(--muted)">
+                                    ${empty p.warehouseName ? '-' : p.warehouseName}
+                                    <c:if test="${isDefect}">
+                                        <span class="badge badge-defect" style="margin-left:4px;">불량</span>
+                                    </c:if>
+                                </td>
+                                <td style="text-align:right; font-weight:700; ${isDefect ? 'color:#9CA3AF;' : (isLow ? 'color:#E11D48;' : 'color:#059669;')}">
                                     <fmt:formatNumber value="${p.qtyOnHand}" pattern="#,##0.###"/>
                                 </td>
                                 <td style="text-align:right; color:var(--muted)">
@@ -140,25 +156,35 @@
                                     <fmt:formatNumber value="${p.reorderPoint}" pattern="#,##0.###"/>
                                 </td>
                                 <td>
-                                    <div class="stock-bar-wrap">
-                                        <div class="stock-bar">
-                                            <div class="stock-bar-inner ${isLow ? 'bar-low' : (ratio < 60 ? 'bar-warn' : 'bar-safe')}"
-                                                 style="width:${ratio}%"></div>
-                                        </div>
-                                        <span class="badge ${isLow ? 'badge-low' : (ratio < 60 ? 'badge-warn' : 'badge-safe')}">
-                                            ${isLow ? '⚠ 발주' : (ratio < 60 ? '주의' : '정상')}
-                                        </span>
-                                    </div>
+                                    <c:choose>
+                                        <c:when test="${isDefect}">
+                                            <span class="badge badge-defect">불량창고</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="stock-bar-wrap">
+                                                <div class="stock-bar">
+                                                    <div class="stock-bar-inner ${isLow ? 'bar-low' : (ratio < 60 ? 'bar-warn' : 'bar-safe')}"
+                                                         style="width:${ratio}%"></div>
+                                                </div>
+                                                <span class="badge ${isLow ? 'badge-low' : (ratio < 60 ? 'badge-warn' : 'badge-safe')}">
+                                                    ${isLow ? '⚠ 발주' : (ratio < 60 ? '주의' : '정상')}
+                                                </span>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                                 <td>
-                                    <c:if test="${not empty p.warehouseId}">
+                                    <c:if test="${p.warehouseId > 0 and not isDefect}">
                                         <button class="btn-edit"
                                             onclick="openStockModal(${p.productId},${p.warehouseId},'${p.productName}',${p.qtyOnHand})">
                                             수량 조정
                                         </button>
                                     </c:if>
-                                    <c:if test="${empty p.warehouseId}">
+                                    <c:if test="${p.warehouseId == 0 or empty p.warehouseId}">
                                         <span style="font-size:11px; color:var(--muted)">창고미배정</span>
+                                    </c:if>
+                                    <c:if test="${isDefect}">
+                                        <span style="font-size:11px; color:#9CA3AF">조정불가</span>
                                     </c:if>
                                 </td>
                             </tr>

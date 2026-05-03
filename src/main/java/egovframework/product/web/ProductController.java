@@ -77,10 +77,23 @@ public class ProductController {
 
     // ── 재고 현황 ──────────────────────────────────
     @GetMapping("/stock/list.do")
-    public String stockList(@ModelAttribute ProductVO vo, Model model, HttpSession session) {
+    public String stockList(@ModelAttribute ProductVO vo,
+                            @RequestParam(value = "includeDefect", required = false) String includeDefect,
+                            Model model, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
-        model.addAttribute("stockList",     productService.getStockList(vo));
-        model.addAttribute("totalCount",    productService.getStockCount(vo));
+
+        vo.setIncludeDefect(includeDefect);
+
+        if ("Y".equals(includeDefect)) {
+            // 불량창고 포함 전체 조회
+            model.addAttribute("stockList",  productService.getStockListAll(vo));
+            model.addAttribute("totalCount", productService.getStockCountAll(vo));
+        } else {
+            // 불량창고 제외 기본 조회
+            model.addAttribute("stockList",  productService.getStockList(vo));
+            model.addAttribute("totalCount", productService.getStockCount(vo));
+        }
+
         model.addAttribute("lowStockCount", productService.getLowStockCount());
         model.addAttribute("searchVO", vo);
         return "product/stockList";
