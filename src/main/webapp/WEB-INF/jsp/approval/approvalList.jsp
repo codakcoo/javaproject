@@ -52,7 +52,7 @@
            font-family: inherit; font-weight: 500; cursor: pointer; border: none;
            display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
            transition: opacity 0.15s; }
-    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary { background: var(--accent); color: black; }
     .btn-primary:hover { opacity: 0.88; }
     .btn-outline { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
     .btn-outline:hover { background: var(--bg); }
@@ -115,7 +115,7 @@
             <div class="page-title">전자결재</div>
             <div class="page-sub">결재 문서를 조회하고 승인/반려 처리합니다.</div>
         </div>
-        <button class="btn btn-primary" onclick="openApprovalNew()">+ 결재 문서 작성</button>
+        <button class="btn btn-primary btn-outline" onclick="openApprovalNew()">+ 결재 문서 작성</button>
     </div>
 
     <!-- 탭 -->
@@ -140,7 +140,7 @@
             <option value="REJECTED" <c:if test="${param.status=='REJECTED'}">selected</c:if>>반려</option>
         </select>
         <input type="text" name="keyword" value="${param.keyword}" placeholder="제목 또는 기안자 검색">
-        <button type="submit" class="btn btn-primary">검색</button>
+        <button type="submit" class="btn btn-primary btn-outline">검색</button>
         <a href="${pageContext.request.contextPath}/approval/list.do" class="btn btn-outline">초기화</a>
     </div>
     </form>

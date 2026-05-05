@@ -63,7 +63,7 @@
         transition: transform 0.2s; flex-shrink: 0;
     }
     .nav-toggle.open svg.arr { transform: rotate(90deg); }
-    .nav-toggle.open { color: var(--blue); font-weight: 600; }
+    .nav-toggle.open { color: var(--text-sm); font-weight: 600; }
 
     /* 서브메뉴 */
     .nav-sub { display: none; background: #FAFAFA; }
@@ -164,12 +164,12 @@
         </div>
         <div class="nav-sub <%=uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
             <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>">총 결재</a>
-            <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/hr/dept") ? "active" : "" %>">요청</a>
-            <a href="${pageContext.request.contextPath}/approval/list.do"
+               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">총 결재</a>
+            <a href="${pageContext.request.contextPath}/approval/pending.do"
+               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">요청</a>
+            <a href="${pageContext.request.contextPath}/approval/rejected.do"
                class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">반려</a>
-            <a href="${pageContext.request.contextPath}/approval/list.do"
+            <a href="${pageContext.request.contextPath}/approval/approved.do"
                class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">완료</a>
         </div>
     </div>
