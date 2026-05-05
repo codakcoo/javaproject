@@ -152,6 +152,10 @@ sequenceDiagram
 ## 재고 현황(연결 안됨)
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b04841d1-e271-48ae-8bcc-9968ff412bcd" />
 
+<br><br>
+<h5>결재관리</h5>
+<img width="174" height="177" alt="image" src="https://github.com/user-attachments/assets/3bc3810a-0bf3-4ac9-ac22-374fe8106706" />
+## 미구현
 
 <br><br>
 <h5>주문관리</h5>

@@ -262,14 +262,15 @@
         SELECT COUNT(*) FROM PRODUCT WHERE is_active = 1
     </select>
 
-<select id="selectLowStockCount" resultType="int">
-    SELECT COUNT(*)
-    FROM   PRODUCT p
-    JOIN   INVENTORY i  ON p.product_id  = i.product_id
-    JOIN   WAREHOUSE  w ON i.warehouse_id = w.warehouse_id
-    WHERE  i.qty_on_hand &lt;= p.reorder_point
-      AND  p.is_active = 1
-      AND  w.type != 'DEFECT'
-</select>
+    <select id="selectLowStockCount" resultType="int">
+    	SELECT COUNT(*)
+    	FROM   PRODUCT p
+    	JOIN   INVENTORY i ON p.product_id  = i.product_id
+    	JOIN   WAREHOUSE w ON i.warehouse_id = w.warehouse_id
+    	WHERE  i.qty_on_hand &lt;= p.reorder_point
+      	AND  p.is_active = 1
+      	AND  w.type != 'DEFECT'
+	</select>
+
 
 </mapper>
