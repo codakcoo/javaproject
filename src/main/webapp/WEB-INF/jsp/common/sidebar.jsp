@@ -173,6 +173,23 @@
                class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">완료</a>
         </div>
     </div>
+    
+    <!-- 주문관리 -->
+    <div class="nav-group">
+        <div class="nav-group-title">주문관리</div>
+        <div class="nav-item nav-toggle <%= uri.contains("/approval") ? "open" : "" %>"
+             onclick="toggleMenu('orderMenu', this)">
+            <div class="toggle-left">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                주문관리
+            </div>
+            <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+        </div>
+        <div class="nav-sub <%=uri.contains("/approval") ? "open" : "" %>" id="orderMenu">
+            <a href="${pageContext.request.contextPath}/approval/list.do"
+               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>">영수증</a>
+        </div>
+    </div>
 
     <div class="sb-ver">ERP v1.0 · eGovFrame 4.3</div>
 </nav>

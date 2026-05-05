@@ -116,7 +116,7 @@
 
     <div class="page-header">
         <div>
-            <div class="page-title">직원 관리</div>
+            <div class="page-title">직원 목록</div>
             <div class="page-sub">전체 직원 목록을 조회하고 관리합니다.</div>
         </div>
         <a href="${pageContext.request.contextPath}/hr/insertForm.do" class="btn btn-success">
