@@ -5,28 +5,30 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/hr")
 public class HrController {
 
-    // 직원 목록 → /hr/list.do
+    /** 직원 목록 */
     @GetMapping("/list.do")
-    public String empList(Model model) {
-        // DB 연동 전까지는 빈 Model만 넘김
-        // model.addAttribute("empList", hrService.selectEmpList());
+    public String empList(Model model, HttpSession session) {
+        if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         return "hr/empList";
     }
 
-    // 직원 등록 폼 → /hr/insertForm.do
+    /** 직원 등록 폼 */
     @GetMapping("/insertForm.do")
-    public String insertForm() {
+    public String insertForm(HttpSession session) {
+        if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         return "hr/empForm";
     }
 
-    // 직원 수정 폼 → /hr/updateForm.do?empId=EMP001
+    /** 직원 수정 폼 */
     @GetMapping("/updateForm.do")
-    public String updateForm() {
-        // model.addAttribute("emp", hrService.selectEmployee(empId));
+    public String updateForm(HttpSession session) {
+        if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         return "hr/empForm";
     }
 }

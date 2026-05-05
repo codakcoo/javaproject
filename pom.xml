@@ -146,6 +146,13 @@
 			<version>${spring.maven.artifact.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Jackson JSON 직렬화 (ResponseBody용) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+
 		<!-- mysql -->
 		<dependency>
             <groupId>mysql</groupId>
