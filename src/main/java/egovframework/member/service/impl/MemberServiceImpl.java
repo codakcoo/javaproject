@@ -14,20 +14,24 @@ public class MemberServiceImpl implements MemberService {
     private MemberMapper memberMapper;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    
+
     @Override
     public void register(MemberVO member) {
-        member.setPassword(encoder.encode(member.getPassword())); // BCrypt 암호화
+        member.setPassword(encoder.encode(member.getPassword()));
         memberMapper.insertMember(member);
     }
-    
+
     @Override
     public MemberVO login(String memberId, String password) {
         MemberVO member = memberMapper.selectMember(memberId);
-
         if (member == null || !encoder.matches(password, member.getPassword())) {
             return null;
         }
         return member;
+    }
+
+    @Override
+    public boolean isDuplicateId(String memberId) {
+        return memberMapper.selectMember(memberId) != null;
     }
 }

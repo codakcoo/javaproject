@@ -35,4 +35,7 @@ public interface ProductMapper {
     // 대시보드
     int             selectTotalProductCount();
     int             selectLowStockCount();
+
+    // 자동 채번: 카테고리별 마지막 상품코드 조회
+    String          selectLastProductCodeByCategory(String category);
 }

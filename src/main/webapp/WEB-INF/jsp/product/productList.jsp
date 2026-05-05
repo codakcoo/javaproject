@@ -48,6 +48,54 @@
     .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
 </style>
 
+<%-- ── 서버에서 productList를 JS 배열로 변환 (카테고리별 최대 번호 계산용) ── --%>
+<script>
+var existingProducts = [
+    <c:forEach var="p" items="${productList}" varStatus="st">
+        { category: '${p.category}', code: '${p.productCode}' }<c:if test="${!st.last}">,</c:if>
+    </c:forEach>
+];
+
+var PREFIX_MAP = {
+    '식품':   'FOOD',
+    '전자':   'ELEC',
+    '소모품': 'CONS',
+    '원자재': 'RAW',
+    '기타':   'ETC'
+};
+
+function generateNextCode(category) {
+    if (!category) return '';
+    var prefix = PREFIX_MAP[category] || 'ETC';
+
+    var maxNum = 0;
+    for (var i = 0; i < existingProducts.length; i++) {
+        var p = existingProducts[i];
+        if (p.category !== category) continue;
+        // 코드에서 숫자 부분 추출 (예: FOOD-012 → 12)
+        var parts = p.code.split('-');
+        var num = parseInt(parts[parts.length - 1], 10);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+    }
+
+    var next = maxNum + 1;
+    var padded = (next < 10) ? '00' + next : (next < 100) ? '0' + next : '' + next;
+    return prefix + '-' + padded;
+}
+
+function onCategoryChange(selectEl) {
+    var category = selectEl.value;
+    var codeInput = document.getElementById('i_code');
+    if (!category) {
+        codeInput.value = '';
+        codeInput.placeholder = '카테고리를 먼저 선택하세요';
+        return;
+    }
+    var nextCode = generateNextCode(category);
+    codeInput.value = nextCode;
+}
+</script>
+
 <main id="content">
     <div class="page-header">
         <div>
@@ -131,11 +179,20 @@
         <div class="modal-title">상품 등록</div>
         <form method="post" action="${pageContext.request.contextPath}/product/insert.do">
             <div class="form-2col">
-                <div class="form-row"><label>상품코드 *</label><input type="text" name="productCode" placeholder="예: FOOD-011" required></div>
-                <div class="form-row"><label>카테고리</label>
-                    <select name="category">
-                        <option value="식품">식품</option><option value="전자">전자</option>
-                        <option value="소모품">소모품</option><option value="원자재">원자재</option><option value="기타">기타</option>
+                <div class="form-row">
+                    <label>상품코드 *</label>
+                    <input type="text" name="productCode" id="i_code"
+                           placeholder="카테고리를 먼저 선택하세요" required>
+                </div>
+                <div class="form-row">
+                    <label>카테고리</label>
+                    <select name="category" onchange="onCategoryChange(this)">
+                        <option value="">-- 선택 --</option>
+                        <option value="식품">식품</option>
+                        <option value="전자">전자</option>
+                        <option value="소모품">소모품</option>
+                        <option value="원자재">원자재</option>
+                        <option value="기타">기타</option>
                     </select>
                 </div>
             </div>
