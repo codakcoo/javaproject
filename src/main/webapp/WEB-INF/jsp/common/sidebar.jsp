@@ -164,13 +164,15 @@
         </div>
         <div class="nav-sub <%=uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
             <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">총 결재</a>
+               class="nav-item <%= uri.contains("/list") ? "active" : "" %>">전체</a>
             <a href="${pageContext.request.contextPath}/approval/pending.do"
-               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">요청</a>
+               class="nav-item <%= uri.contains("/pending") ? "active" : "" %>">요청</a>
+               <a href="${pageContext.request.contextPath}/approval/inProgress.do"
+               class="nav-item <%= uri.contains("/inProgress") ? "active" : "" %>">진행중</a>
             <a href="${pageContext.request.contextPath}/approval/rejected.do"
-               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">반려</a>
+               class="nav-item <%= uri.contains("/rejected") ? "active" : "" %>">반려</a>
             <a href="${pageContext.request.contextPath}/approval/approved.do"
-               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">완료</a>
+               class="nav-item <%= uri.contains("/approved") ? "active" : "" %>">결재</a>
         </div>
     </div>
     

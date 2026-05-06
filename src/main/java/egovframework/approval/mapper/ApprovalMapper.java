@@ -4,26 +4,18 @@ import egovframework.approval.vo.ApprovalDocVO;
 import egovframework.approval.vo.ApprovalDocItemVO;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ApprovalMapper {
-
-    // ── 목록 조회 ──────────────────────────────
     List<ApprovalDocVO> selectApprovalList(ApprovalDocVO vo);
     int selectApprovalCount(ApprovalDocVO vo);
-
-    // ── 상세 조회 ──────────────────────────────
+    Map<String, Object> selectStatusCounts();
     ApprovalDocVO selectApproval(Long docId);
     List<ApprovalDocItemVO> selectApprovalItems(Long docId);
-
-    // ── 등록 ──────────────────────────────────
-    void insertApprovalDoc(ApprovalDocVO vo);       // useGeneratedKeys → docId 자동 주입
+    void insertApprovalDoc(ApprovalDocVO vo);
     void insertApprovalItem(ApprovalDocItemVO vo);
-
-    // ── 상태 변경 ──────────────────────────────
-    void updateApprovalStatus(ApprovalDocVO vo);    // status, rejectReason, approvedAt
-
-    // ── 삭제 (DRAFT 상태만) ───────────────────
+    void updateApprovalStatus(ApprovalDocVO vo);
     void deleteApprovalDoc(Long docId);
     void deleteApprovalItems(Long docId);
 }

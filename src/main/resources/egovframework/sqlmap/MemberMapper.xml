@@ -23,4 +23,11 @@
         WHERE  member_id = #{memberId}
     </select>
 
+    <!-- 결재자 목록 (전체 회원) -->
+    <select id="selectMemberList" resultMap="memberResultMap">
+        SELECT member_id, name, role
+        FROM   member
+        ORDER BY name
+    </select>
+
 </mapper>
