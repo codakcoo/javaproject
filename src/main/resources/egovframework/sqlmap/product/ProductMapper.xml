@@ -101,6 +101,11 @@
         DELETE FROM PRODUCT WHERE product_id = #{productId}
     </delete>
 
+    <!-- 상품 삭제 시 INVENTORY 먼저 제거 (FK 제약 방지) -->
+    <delete id="deleteInventoryByProductId" parameterType="Long">
+        DELETE FROM INVENTORY WHERE product_id = #{productId}
+    </delete>
+
     <!-- ============================================================ -->
     <!--  판매 현황 (SALES_ORDER)                                        -->
     <!-- ============================================================ -->
@@ -272,5 +277,33 @@
       	AND  w.type != 'DEFECT'
 	</select>
 
+    <!-- ============================================================ -->
+    <!--  자동 채번                                                       -->
+    <!-- ============================================================ -->
+    <select id="selectLastProductCodeByCategory" parameterType="String" resultType="String">
+        SELECT product_code
+        FROM   PRODUCT
+        WHERE  category = #{category}
+        ORDER BY product_id DESC
+        LIMIT 1
+    </select>
+
+    <!-- ============================================================ -->
+    <!--  창고 / INVENTORY                                              -->
+    <!-- ============================================================ -->
+    <!-- 기본 창고: DEFECT 아닌 것 중 첫 번째 -->
+    <select id="selectDefaultWarehouseId" resultType="Long">
+        SELECT warehouse_id
+        FROM   WAREHOUSE
+        WHERE  type != 'DEFECT'
+        ORDER BY warehouse_id ASC
+        LIMIT 1
+    </select>
+
+    <!-- 상품 등록 시 INVENTORY 레코드 자동 생성 -->
+    <insert id="insertInventory" parameterType="egovframework.product.vo.ProductVO">
+        INSERT INTO INVENTORY (product_id, warehouse_id, qty_on_hand, qty_reserved)
+        VALUES (#{productId}, #{warehouseId}, #{qtyOnHand}, 0)
+    </insert>
 
 </mapper>
