@@ -7,105 +7,86 @@
 <style>
     .page-header {
         display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 20px;
+        margin-bottom: 12px; padding-bottom: 8px;
+        border-bottom: 2px solid var(--blue);
     }
-    .page-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
-    .page-sub   { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .page-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .page-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-    /* 탭 */
+    /* ── 탭 ── */
     .tab-bar {
-        display: flex; gap: 0;
-        border-bottom: 2px solid var(--border);
-        margin-bottom: 16px;
+        display: flex; border-bottom: 2px solid var(--border);
+        margin-bottom: 10px;
     }
     .tab-item {
-        padding: 10px 20px; font-size: 13px; font-weight: 500;
+        padding: 8px 16px; font-size: 12px; font-weight: 500;
         color: var(--muted); cursor: pointer; border: none; background: none;
         font-family: inherit; border-bottom: 2px solid transparent;
-        margin-bottom: -2px; transition: color 0.15s;
-        display: flex; align-items: center; gap: 6px;
+        margin-bottom: -2px; display: flex; align-items: center; gap: 5px;
+        text-decoration: none; transition: color 0.15s;
     }
-    .tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-item.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 700; }
     .tab-item:hover  { color: var(--text); }
-    .tab-count {
-        background: var(--accent); color: white;
-        font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700;
+    .tab-cnt {
+        font-size: 10px; padding: 1px 5px; border-radius: 8px;
+        font-weight: 700; color: white; background: var(--muted);
     }
-    .tab-count.gray { background: var(--muted); }
+    .tab-cnt.blue   { background: var(--blue); }
+    .tab-cnt.orange { background: #F59E0B; }
+    .tab-cnt.green  { background: #059669; }
+    .tab-cnt.red    { background: #E11D48; }
 
-    /* 검색 */
-    .search-card {
+    /* ── 검색 ── */
+    .search-bar {
         background: var(--surface); border: 1px solid var(--border);
-        border-radius: 12px; padding: 14px 18px;
-        margin-bottom: 16px; display: flex; gap: 10px; align-items: center;
+        padding: 8px 12px; margin-bottom: 8px;
+        display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
     }
-    .search-card input, .search-card select {
-        height: 36px; padding: 0 12px; border: 1px solid var(--border);
-        border-radius: 8px; font-size: 13px; font-family: inherit;
-        color: var(--text); background: var(--bg); outline: none;
-        transition: border-color 0.2s;
+    .search-bar label { font-size: 12px; color: var(--text-sm); }
+    .search-bar select, .search-bar input {
+        height: 26px; padding: 0 6px; border: 1px solid #BBBBBB;
+        border-radius: 2px; font-size: 12px; font-family: inherit; outline: none;
     }
-    .search-card input:focus, .search-card select:focus { border-color: var(--accent); }
-    .search-card input { width: 200px; }
+    .search-bar select:focus, .search-bar input:focus { border-color: var(--blue); }
 
-    .btn { height: 36px; padding: 0 16px; border-radius: 8px; font-size: 13px;
-           font-family: inherit; font-weight: 500; cursor: pointer; border: none;
-           display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
-           transition: opacity 0.15s; }
-    .btn-primary { background: var(--accent); color: black; }
-    .btn-primary:hover { opacity: 0.88; }
-    .btn-outline { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-    .btn-outline:hover { background: var(--bg); }
-    .ml-auto { margin-left: auto; }
-
-    /* 테이블 */
-    .table-card {
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 12px; overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    /* ── 테이블 ── */
+    .tbl-wrap { border: 1px solid var(--border); overflow: auto; background: var(--surface); }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tbl thead th {
+        background: #F5F5F5; border: 1px solid #CCCCCC;
+        padding: 6px 8px; font-weight: 600; color: #333;
+        text-align: center; white-space: nowrap;
     }
-    table { width: 100%; border-collapse: collapse; }
-    thead th {
-        background: #F8FAFC; font-size: 12px; font-weight: 600;
-        color: var(--muted); text-align: left; padding: 10px 16px;
-        border-bottom: 1px solid var(--border); white-space: nowrap;
-    }
-    tbody tr { border-bottom: 1px solid #F1F5F9; transition: background 0.1s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #F8FAFF; }
-    tbody td { padding: 12px 16px; font-size: 13px; color: var(--text); }
+    .tbl tbody td { border: 1px solid var(--border); padding: 5px 8px; vertical-align: middle; }
+    .tbl tbody tr:hover { background: #F0F6FF; }
+    .tbl-title { color: var(--blue); cursor: pointer; font-weight: 500; }
+    .tbl-title:hover { text-decoration: underline; }
 
-    .doc-title { font-weight: 500; color: var(--navy); cursor: pointer; }
-    .doc-title:hover { text-decoration: underline; color: var(--accent); }
+    /* ── 상태 배지 ── */
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 11px; font-weight: 600; }
+    .badge-pending     { background: #FFF7ED; color: #D97706; border: 1px solid #FCD34D; }
+    .badge-inprogress  { background: #EEF2FF; color: #4338CA; border: 1px solid #A5B4FC; }
+    .badge-approved    { background: #ECFDF5; color: #059669; border: 1px solid #6EE7B7; }
+    .badge-rejected    { background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF; }
+    .badge-draft       { background: #F5F5F5; color: #555;    border: 1px solid #CCC; }
 
-    .status-badge {
-        display: inline-flex; align-items: center; gap: 4px;
-        padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    }
-    .status-pending  { background: #FFF7ED; color: #D97706; }
-    .status-approved { background: #ECFDF5; color: #059669; }
-    .status-rejected { background: #FFF1F2; color: #E11D48; }
+    /* ── 문서유형 배지 ── */
+    .dtype { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px; font-weight: 600; }
+    .dtype-inbound  { background: #E0F2F1; color: #00796B; border: 1px solid #80CBC4; }
+    .dtype-outbound { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+    .dtype-stockadj { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
 
-    .btn-view {
-        background: #EFF6FF; color: #2563EB; border: none;
-        padding: 4px 10px; border-radius: 6px; font-size: 12px;
-        font-family: inherit; cursor: pointer; font-weight: 500;
+    /* ── 버튼 ── */
+    .btn-sm {
+        height: 22px; padding: 0 8px; border-radius: 2px;
+        font-size: 11px; font-family: inherit; font-weight: 500;
+        cursor: pointer; border: 1px solid; white-space: nowrap;
     }
-    .btn-view:hover { background: #DBEAFE; }
-
-    .btn-approve {
-        background: #ECFDF5; color: #059669; border: none;
-        padding: 4px 10px; border-radius: 6px; font-size: 12px;
-        font-family: inherit; cursor: pointer; font-weight: 500;
-    }
-    .btn-approve:hover { background: #D1FAE5; }
-
-    .btn-reject {
-        background: #FFF1F2; color: #E11D48; border: none;
-        padding: 4px 10px; border-radius: 6px; font-size: 12px;
-        font-family: inherit; cursor: pointer; font-weight: 500;
-    }
-    .btn-reject:hover { background: #FFE4E6; }
+    .btn-view     { background: #EFF6FF; color: #2563EB; border-color: #93C5FD; }
+    .btn-progress { background: #EEF2FF; color: #4338CA; border-color: #A5B4FC; }
+    .btn-approve  { background: #ECFDF5; color: #059669; border-color: #6EE7B7; }
+    .btn-reject   { background: #FFF1F2; color: #E11D48; border-color: #FDA4AF; }
+    .btn-delete   { background: #F5F5F5; color: #555;    border-color: #CCC; }
 </style>
 
 <main id="content">
@@ -113,125 +94,144 @@
     <div class="page-header">
         <div>
             <div class="page-title">전자결재</div>
-            <div class="page-sub">결재 문서를 조회하고 승인/반려 처리합니다.</div>
+            <div class="page-sub">결재관리 &gt; 전자결재</div>
         </div>
-        <button class="btn btn-primary btn-outline" onclick="openApprovalNew()">+ 결재 문서 작성</button>
+        <button class="btn btn-primary" onclick="openForm()">+ 결재 문서 작성</button>
     </div>
 
     <!-- 탭 -->
     <div class="tab-bar">
-        <button class="tab-item active" onclick="switchTab(this, 'all')">
-            전체 <span class="tab-count gray">3</span>
-        </button>
-        <button class="tab-item" onclick="switchTab(this, 'pending')">
-            대기 <span class="tab-count">1</span>
-        </button>
-        <button class="tab-item" onclick="switchTab(this, 'approved')">승인</button>
-        <button class="tab-item" onclick="switchTab(this, 'rejected')">반려</button>
+        <a href="${pageContext.request.contextPath}/approval/list.do"
+           class="tab-item ${activeTab == 'all' ? 'active' : ''}">
+            전체
+            <span class="tab-cnt ${activeTab == 'all' ? 'blue' : ''}">${tabCounts.total}</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/approval/pending.do"
+           class="tab-item ${activeTab == 'pending' ? 'active' : ''}">
+            기안중
+            <span class="tab-cnt orange">${tabCounts.pending}</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/approval/inProgress.do"
+           class="tab-item ${activeTab == 'inProgress' ? 'active' : ''}">
+            진행중
+            <span class="tab-cnt ${activeTab == 'inProgress' ? 'blue' : ''}">${tabCounts.inProgress}</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/approval/rejected.do"
+           class="tab-item ${activeTab == 'rejected' ? 'active' : ''}">
+            반려
+            <span class="tab-cnt red">${tabCounts.rejected}</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/approval/approved.do"
+           class="tab-item ${activeTab == 'approved' ? 'active' : ''}">
+            결재
+            <span class="tab-cnt green">${tabCounts.approved}</span>
+        </a>
     </div>
 
     <!-- 검색 -->
-    <form action="${pageContext.request.contextPath}/approval/list.do" method="get">
-    <div class="search-card">
-        <select name="status">
-            <option value="">전체 상태</option>
-            <option value="PENDING"  <c:if test="${param.status=='PENDING'}">selected</c:if>>대기</option>
-            <option value="APPROVED" <c:if test="${param.status=='APPROVED'}">selected</c:if>>승인</option>
-            <option value="REJECTED" <c:if test="${param.status=='REJECTED'}">selected</c:if>>반려</option>
+    <form action="${pageContext.request.contextPath}/approval/${activeTab == 'pending' ? 'pending' : activeTab == 'inProgress' ? 'inProgress' : activeTab == 'rejected' ? 'rejected' : activeTab == 'approved' ? 'approved' : 'list'}.do" method="get">
+    <div class="search-bar">
+        <label>문서유형</label>
+        <select name="searchDocType">
+            <option value="">전체</option>
+            <option value="INBOUND"   ${searchVO.searchDocType == 'INBOUND'   ? 'selected' : ''}>입고 요청서</option>
+            <option value="OUTBOUND"  ${searchVO.searchDocType == 'OUTBOUND'  ? 'selected' : ''}>출고 요청서</option>
+            <option value="STOCK_ADJ" ${searchVO.searchDocType == 'STOCK_ADJ' ? 'selected' : ''}>재고 조정서</option>
         </select>
-        <input type="text" name="keyword" value="${param.keyword}" placeholder="제목 또는 기안자 검색">
-        <button type="submit" class="btn btn-primary btn-outline">검색</button>
+        <label>제목</label>
+        <input type="text" name="searchTitle" value="${searchVO.searchTitle}" placeholder="제목 검색" style="width:160px">
+        <button type="submit" class="btn btn-primary">검색</button>
         <a href="${pageContext.request.contextPath}/approval/list.do" class="btn btn-outline">초기화</a>
+        <span style="margin-left:auto;font-size:11px;color:var(--muted)">총 ${totalCount}건</span>
     </div>
     </form>
 
     <!-- 테이블 -->
-    <div class="table-card">
-        <table>
+    <div class="tbl-wrap">
+        <table class="tbl">
             <thead>
                 <tr>
-                    <th style="width:60px">번호</th>
+                    <th style="width:50px">번호</th>
+                    <th style="width:80px">문서번호</th>
+                    <th style="width:80px">문서유형</th>
                     <th>제목</th>
-                    <th style="width:80px">기안자</th>
-                    <th style="width:80px">결재자</th>
-                    <th style="width:90px">결재 상태</th>
+                    <th style="width:70px">기안자</th>
+                    <th style="width:70px">결재자</th>
+                    <th style="width:80px">거래처</th>
+                    <th style="width:75px">상태</th>
                     <th style="width:110px">기안일</th>
                     <th style="width:110px">처리일</th>
-                    <th style="width:130px">관리</th>
+                    <th style="width:150px">관리</th>
                 </tr>
             </thead>
-            <tbody id="approvalTableBody">
-
+            <tbody>
                 <c:choose>
-                    <c:when test="${empty approvalList}">
-                        <%-- DB 연동 전 샘플 데이터 --%>
+                    <c:when test="${empty docList}">
                         <tr>
-                            <td>3</td>
-                            <td><span class="doc-title" onclick="viewApproval(3)">2026년 4월 연차 신청 - 홍길동</span></td>
-                            <td>홍길동</td>
-                            <td>김팀장</td>
-                            <td><span class="status-badge status-pending">⏳ 대기</span></td>
-                            <td>2026-04-22</td>
-                            <td>-</td>
-                            <td>
-                                <div style="display:flex;gap:5px">
-                                    <button class="btn-view" onclick="viewApproval(3)">보기</button>
-                                    <button class="btn-approve" onclick="approveDoc(3)">승인</button>
-                                    <button class="btn-reject" onclick="rejectDoc(3)">반려</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td><span class="doc-title" onclick="viewApproval(2)">출장비 정산 요청 - 김철수</span></td>
-                            <td>김철수</td>
-                            <td>이부장</td>
-                            <td><span class="status-badge status-approved">✔ 승인</span></td>
-                            <td>2026-04-20</td>
-                            <td>2026-04-21</td>
-                            <td>
-                                <div style="display:flex;gap:5px">
-                                    <button class="btn-view" onclick="viewApproval(2)">보기</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><span class="doc-title" onclick="viewApproval(1)">비품 구매 요청 - 이영희</span></td>
-                            <td>이영희</td>
-                            <td>박이사</td>
-                            <td><span class="status-badge status-rejected">✕ 반려</span></td>
-                            <td>2026-04-18</td>
-                            <td>2026-04-19</td>
-                            <td>
-                                <div style="display:flex;gap:5px">
-                                    <button class="btn-view" onclick="viewApproval(1)">보기</button>
-                                </div>
+                            <td colspan="11" align="center" style="padding:30px;color:var(--muted)">
+                                결재 문서가 없습니다.
                             </td>
                         </tr>
                     </c:when>
                     <c:otherwise>
-                        <c:forEach items="${approvalList}" var="doc" varStatus="s">
+                        <c:forEach items="${docList}" var="doc">
                         <tr>
-                            <td>${doc.docId}</td>
-                            <td><span class="doc-title" onclick="viewApproval(${doc.docId})">${doc.title}</span></td>
-                            <td>${doc.writerName}</td>
-                            <td>${doc.approverName}</td>
-                            <td>
+                            <td align="center">${doc.docId}</td>
+                            <td align="center" style="font-size:10px;color:var(--muted)">${doc.docNo}</td>
+                            <td align="center">
                                 <c:choose>
-                                    <c:when test="${doc.status == 'PENDING'}"><span class="status-badge status-pending">⏳ 대기</span></c:when>
-                                    <c:when test="${doc.status == 'APPROVED'}"><span class="status-badge status-approved">✔ 승인</span></c:when>
-                                    <c:otherwise><span class="status-badge status-rejected">✕ 반려</span></c:otherwise>
+                                    <c:when test="${doc.docType == 'INBOUND'}">
+                                        <span class="dtype dtype-inbound">입고</span>
+                                    </c:when>
+                                    <c:when test="${doc.docType == 'OUTBOUND'}">
+                                        <span class="dtype dtype-outbound">출고</span>
+                                    </c:when>
+                                    <c:when test="${doc.docType == 'STOCK_ADJ'}">
+                                        <span class="dtype dtype-stockadj">재고조정</span>
+                                    </c:when>
+                                    <c:otherwise><span class="dtype">-</span></c:otherwise>
                                 </c:choose>
                             </td>
-                            <td>${doc.createdAt}</td>
-                            <td>${empty doc.approvedAt ? '-' : doc.approvedAt}</td>
                             <td>
-                                <div style="display:flex;gap:5px">
-                                    <button class="btn-view" onclick="viewApproval(${doc.docId})">보기</button>
+                                <span class="tbl-title" onclick="viewDoc(${doc.docId})">${doc.title}</span>
+                            </td>
+                            <td align="center">${doc.requesterName}</td>
+                            <td align="center">${empty doc.approverName ? '-' : doc.approverName}</td>
+                            <td align="center" style="font-size:11px">${empty doc.partnerName ? '-' : doc.partnerName}</td>
+                            <td align="center">
+                                <c:choose>
+                                    <c:when test="${doc.status == 'PENDING'}">
+                                        <span class="badge badge-pending">기안중</span>
+                                    </c:when>
+                                    <c:when test="${doc.status == 'IN_PROGRESS'}">
+                                        <span class="badge badge-inprogress">진행중</span>
+                                    </c:when>
+                                    <c:when test="${doc.status == 'APPROVED'}">
+                                        <span class="badge badge-approved">결재</span>
+                                    </c:when>
+                                    <c:when test="${doc.status == 'REJECTED'}">
+                                        <span class="badge badge-rejected">반려</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge badge-draft">임시저장</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td align="center" style="font-size:11px">${doc.requestedAt}</td>
+                            <td align="center" style="font-size:11px">${empty doc.approvedAt ? '-' : doc.approvedAt}</td>
+                            <td>
+                                <div style="display:flex;gap:3px;justify-content:center">
+                                    <button class="btn-sm btn-view" onclick="viewDoc(${doc.docId})">보기</button>
                                     <c:if test="${doc.status == 'PENDING'}">
-                                        <button class="btn-approve" onclick="approveDoc(${doc.docId})">승인</button>
-                                        <button class="btn-reject" onclick="rejectDoc(${doc.docId})">반려</button>
+                                        <button class="btn-sm btn-progress" onclick="startReview(${doc.docId})">검토시작</button>
+                                        <button class="btn-sm btn-reject"   onclick="rejectDoc(${doc.docId})">반려</button>
+                                    </c:if>
+                                    <c:if test="${doc.status == 'IN_PROGRESS'}">
+                                        <button class="btn-sm btn-approve" onclick="approveDoc(${doc.docId})">승인</button>
+                                        <button class="btn-sm btn-reject"  onclick="rejectDoc(${doc.docId})">반려</button>
+                                    </c:if>
+                                    <c:if test="${doc.status == 'DRAFT'}">
+                                        <button class="btn-sm btn-delete" onclick="deleteDoc(${doc.docId})">삭제</button>
                                     </c:if>
                                 </div>
                             </td>
@@ -239,7 +239,6 @@
                         </c:forEach>
                     </c:otherwise>
                 </c:choose>
-
             </tbody>
         </table>
     </div>
@@ -247,52 +246,53 @@
 </main>
 
 <script>
-// 새 결재 문서 작성 팝업
-function openApprovalNew() {
-    window.open(
-        '${pageContext.request.contextPath}/approval/form.do',
-        'approvalPopup',
-        'width=720,height=640,top=100,left=300,scrollbars=yes,resizable=no'
-    );
+const ctx = '${pageContext.request.contextPath}';
+
+function openForm() {
+    window.open(ctx + '/approval/form.do', 'approvalForm',
+        'width=760,height=680,top=80,left=280,scrollbars=yes,resizable=no');
 }
 
-// 결재 문서 상세 보기 팝업
-function viewApproval(docId) {
-    window.open(
-        '${pageContext.request.contextPath}/approval/view.do?docId=' + docId,
-        'approvalView',
-        'width=720,height=640,top=100,left=300,scrollbars=yes,resizable=no'
-    );
+function viewDoc(docId) {
+    window.open(ctx + '/approval/detail.do?docId=' + docId, 'approvalDetail',
+        'width=760,height=680,top=80,left=280,scrollbars=yes,resizable=no');
 }
 
-// 승인 처리
+function startReview(docId) {
+    if (!confirm('검토를 시작하시겠습니까? (기안중 → 진행중)')) return;
+    fetch(ctx + '/approval/startReview.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'docId=' + docId
+    }).then(() => location.reload());
+}
+
 function approveDoc(docId) {
-    if(confirm('승인 처리하시겠습니까?')) {
-        // DB 연동 후 fetch or form submit
-        fetch('${pageContext.request.contextPath}/approval/approve.do', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'docId=' + docId
-        }).then(r => r.text()).then(() => location.reload());
-    }
+    if (!confirm('승인 처리하시겠습니까?')) return;
+    fetch(ctx + '/approval/approve.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'docId=' + docId
+    }).then(() => location.reload());
 }
 
-// 반려 처리
 function rejectDoc(docId) {
     const reason = prompt('반려 사유를 입력하세요:');
-    if(reason !== null && reason.trim() !== '') {
-        fetch('${pageContext.request.contextPath}/approval/reject.do', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'docId=' + docId + '&reason=' + encodeURIComponent(reason)
-        }).then(r => r.text()).then(() => location.reload());
-    }
+    if (!reason || !reason.trim()) return;
+    fetch(ctx + '/approval/reject.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'docId=' + docId + '&rejectReason=' + encodeURIComponent(reason)
+    }).then(() => location.reload());
 }
 
-// 탭 전환 (DB 연동 후 실제 필터링으로 교체)
-function switchTab(btn, type) {
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
+function deleteDoc(docId) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    fetch(ctx + '/approval/delete.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'docId=' + docId
+    }).then(() => location.reload());
 }
 </script>
 

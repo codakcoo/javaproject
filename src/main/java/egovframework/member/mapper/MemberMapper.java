@@ -2,12 +2,11 @@ package egovframework.member.mapper;
 
 import egovframework.member.vo.MemberVO;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
+import java.util.List;
 
 @Mapper
-public interface MemberMapper 
-{
-    // 아이디로 회원 단건 조회
-    MemberVO selectMember(String memberId);
-    // 인터페이스 매서드 추가 
-    void insertMember(MemberVO member);
+public interface MemberMapper {
+    MemberVO       selectMember(String memberId);
+    void           insertMember(MemberVO member);
+    List<MemberVO> selectMemberList();   // ← 추가: 결재자 목록용
 }

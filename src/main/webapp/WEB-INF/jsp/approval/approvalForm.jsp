@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
-    // 팝업은 별도 세션 체크 (선택)
     Object loginUser = session.getAttribute("loginUser");
     if(loginUser == null) {
         out.println("<script>alert('로그인이 필요합니다.'); window.close();</script>");
@@ -12,283 +11,323 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>전자결재 - 문서 작성</title>
+    <title>결재 문서 작성</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --navy:   #1E2761;
-            --accent: #4A90D9;
-            --border: #E2E8F0;
-            --text:   #1E293B;
-            --muted:  #64748B;
-            --bg:     #F0F4FF;
-        }
-
+        :root { --blue:#0066CC; --border:#DDDDDD; --text:#222; --muted:#888; }
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background: #F8FAFC; color: var(--text);
-            height: 100vh; display: flex; flex-direction: column;
+            font-family: -apple-system, "Malgun Gothic", sans-serif;
+            font-size: 12px; background: #F2F3F5; color: var(--text);
+            display: flex; flex-direction: column; height: 100vh;
         }
-
-        /* 팝업 헤더 */
-        .popup-header {
-            background: var(--navy); padding: 14px 20px;
-            display: flex; align-items: center; justify-content: space-between;
-            flex-shrink: 0;
+        .pop-head {
+            background: var(--blue); padding: 10px 16px;
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
         }
-        .popup-header h2 { font-size: 15px; font-weight: 700; color: white; }
-        .popup-header .sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-        .btn-close {
-            width: 28px; height: 28px; border-radius: 6px;
-            background: rgba(255,255,255,0.1); border: none;
-            color: white; font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.15s;
+        .pop-head h2 { font-size: 14px; font-weight: 700; color: white; }
+        .pop-head .sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+        .btn-x {
+            background: rgba(255,255,255,0.15); border: none; color: white;
+            width: 26px; height: 26px; border-radius: 3px; font-size: 14px;
+            cursor: pointer;
         }
-        .btn-close:hover { background: rgba(255,255,255,0.2); }
-
-        /* 스크롤 영역 */
-        .popup-body {
-            flex: 1; overflow-y: auto; padding: 20px;
-        }
-
-        /* 결재선 표시 */
         .approval-line {
-            background: white; border: 1px solid var(--border);
-            border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;
-            display: flex; align-items: center; gap: 8px;
+            background: white; border-bottom: 1px solid var(--border);
+            padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
         }
         .approver-box {
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 8px 14px; text-align: center; min-width: 80px;
+            border: 1px solid var(--border); padding: 6px 12px;
+            text-align: center; min-width: 70px; border-radius: 2px;
         }
-        .approver-box .role { font-size: 10px; color: var(--muted); }
-        .approver-box .name { font-size: 13px; font-weight: 600; color: var(--navy); margin-top: 2px; }
-        .approver-box .stamp {
-            font-size: 10px; color: #059669; font-weight: 700;
-            border: 1px solid #059669; border-radius: 4px;
-            padding: 1px 6px; display: inline-block; margin-top: 3px;
-        }
-        .arrow-icon { color: var(--muted); font-size: 18px; }
-
-        /* 폼 */
-        .form-section {
-            background: white; border: 1px solid var(--border);
-            border-radius: 10px; padding: 16px 18px; margin-bottom: 14px;
-        }
-        .section-title {
-            font-size: 12px; font-weight: 700; color: var(--navy);
-            margin-bottom: 12px; padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .form-row { display: flex; gap: 12px; margin-bottom: 10px; }
-        .form-row:last-child { margin-bottom: 0; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .form-group label {
-            font-size: 11px; font-weight: 600; color: var(--muted);
-        }
+        .approver-box .role  { font-size: 10px; color: var(--muted); }
+        .approver-box .name  { font-size: 12px; font-weight: 700; margin-top: 2px; }
+        .approver-box .stamp { font-size: 10px; font-weight: 700; border-radius: 2px; padding: 1px 5px; display: inline-block; margin-top: 3px; }
+        .stamp-done { border: 1px solid #059669; color: #059669; }
+        .stamp-wait { border: 1px solid #D97706; color: #D97706; }
+        .arr { color: var(--muted); font-size: 16px; }
+        .pop-body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+        .section { background: white; border: 1px solid var(--border); margin-bottom: 10px; }
+        .section-head { background: #F5F5F5; border-bottom: 1px solid var(--border); padding: 6px 12px; font-size: 11px; font-weight: 700; color: #444; }
+        .section-body { padding: 10px 12px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .form-group { display: flex; flex-direction: column; gap: 3px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 11px; color: var(--muted); font-weight: 600; }
         .form-group label .req { color: #E11D48; }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            height: 36px; padding: 0 10px;
-            border: 1px solid var(--border); border-radius: 7px;
-            font-size: 13px; font-family: inherit;
-            color: var(--text); background: var(--bg); outline: none;
-            transition: border-color 0.2s;
+        .form-group input, .form-group select {
+            height: 26px; padding: 0 7px; border: 1px solid #BBBBBB;
+            border-radius: 2px; font-size: 12px; font-family: inherit;
+            color: var(--text); outline: none; background: white;
         }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: var(--accent);
-            background: white;
+        .form-group input:focus, .form-group select:focus { border-color: var(--blue); }
+        .item-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .item-tbl th { background: #F5F5F5; border: 1px solid #CCC; padding: 5px 6px; text-align: center; font-weight: 600; color: #444; }
+        .item-tbl td { border: 1px solid var(--border); padding: 4px 6px; }
+        .item-tbl input, .item-tbl select {
+            width: 100%; height: 24px; padding: 0 5px;
+            border: 1px solid #BBBBBB; border-radius: 2px; font-size: 11px; font-family: inherit; outline: none;
         }
-        .form-group textarea {
-            height: 130px; padding: 10px; resize: vertical;
+        .item-tbl input:focus, .item-tbl select:focus { border-color: var(--blue); }
+        .btn-add-row {
+            margin-top: 6px; height: 24px; padding: 0 10px;
+            background: #F0F6FF; color: var(--blue); border: 1px solid #B8D0F0;
+            border-radius: 2px; font-size: 11px; font-family: inherit; cursor: pointer;
         }
-        .form-group input[readonly] {
-            background: #F1F5F9; color: var(--muted);
+        .btn-del-row {
+            height: 22px; padding: 0 6px; background: #FFF1F2; color: #E11D48;
+            border: 1px solid #FDA4AF; border-radius: 2px; font-size: 11px; font-family: inherit; cursor: pointer;
         }
-
-        /* 파일 첨부 */
-        .file-zone {
-            border: 2px dashed var(--border); border-radius: 8px;
-            padding: 16px; text-align: center; cursor: pointer;
-            transition: border-color 0.15s;
-        }
-        .file-zone:hover { border-color: var(--accent); }
-        .file-zone p { font-size: 12px; color: var(--muted); margin-top: 4px; }
-        .file-zone svg { width: 24px; height: 24px; fill: var(--muted); }
-
-        /* 하단 버튼 */
-        .popup-footer {
-            padding: 12px 20px; background: white;
-            border-top: 1px solid var(--border);
-            display: flex; gap: 10px; justify-content: flex-end;
-            flex-shrink: 0;
+        .pop-foot {
+            padding: 10px 16px; background: white; border-top: 1px solid var(--border);
+            display: flex; gap: 6px; justify-content: flex-end; flex-shrink: 0;
         }
         .btn {
-            height: 38px; padding: 0 20px; border-radius: 8px;
-            font-size: 13px; font-family: inherit; font-weight: 500;
-            cursor: pointer; border: none; display: inline-flex;
-            align-items: center; gap: 5px; transition: opacity 0.15s;
+            height: 30px; padding: 0 16px; border-radius: 2px; font-size: 12px;
+            font-family: inherit; font-weight: 500; cursor: pointer;
+            border: 1px solid transparent; display: inline-flex; align-items: center;
         }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { opacity: 0.88; }
-        .btn-outline { background: white; color: var(--text); border: 1px solid var(--border); }
-        .btn-outline:hover { background: var(--bg); }
-        .btn-danger { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
-        .btn-danger:hover { background: #FFE4E6; }
+        .btn-primary { background: var(--blue); color: white; border-color: #0055AA; }
+        .btn-outline { background: white; color: var(--text); border-color: var(--border); }
+        .loading { opacity: 0.6; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<!-- 팝업 헤더 -->
-<div class="popup-header">
+<div class="pop-head">
     <div>
         <h2>전자결재 문서 작성</h2>
-        <div class="sub">기안자: ${loginUser.name} (${loginUser.role})</div>
+        <div class="sub">기안자: ${loginUser.name}</div>
     </div>
-    <button class="btn-close" onclick="window.close()">✕</button>
+    <button class="btn-x" onclick="window.close()">✕</button>
 </div>
 
-<!-- 스크롤 영역 -->
-<div class="popup-body">
-
-    <!-- 결재선 -->
-    <div class="approval-line">
-        <div class="approver-box">
-            <div class="role">기안</div>
-            <div class="name">${loginUser.name}</div>
-            <div class="stamp">기안</div>
-        </div>
-        <div class="arrow-icon">→</div>
-        <div class="approver-box">
-            <div class="role">결재</div>
-            <div class="name" id="approverNameDisplay">미지정</div>
-            <div class="stamp" style="color:#D97706;border-color:#D97706">대기</div>
-        </div>
+<div class="approval-line">
+    <div class="approver-box">
+        <div class="role">기안</div>
+        <div class="name">${loginUser.name}</div>
+        <div class="stamp stamp-done">기안</div>
     </div>
+    <div class="arr">→</div>
+    <div class="approver-box">
+        <div class="role">결재</div>
+        <div class="name" id="approverDisplay">미지정</div>
+        <div class="stamp stamp-wait">대기</div>
+    </div>
+</div>
 
-    <form id="approvalForm" action="${pageContext.request.contextPath}/approval/insert.do" method="post">
-        <input type="hidden" name="writerId" value="${loginUser.memberId}">
-        <c:if test="${not empty param.empId}">
-            <input type="hidden" name="relEmpId" value="${param.empId}">
-        </c:if>
+<div class="pop-body">
+<form id="approvalForm">
 
-        <!-- 문서 기본 정보 -->
-        <div class="form-section">
-            <div class="section-title">문서 정보</div>
-            <div class="form-row">
+    <div class="section">
+        <div class="section-head">문서 정보</div>
+        <div class="section-body">
+            <div class="form-grid">
                 <div class="form-group">
                     <label>문서 유형 <span class="req">*</span></label>
-                    <select name="docType" required onchange="updateTitle(this)">
+                    <select name="docType" id="docType" required onchange="onDocTypeChange(this)">
                         <option value="">유형 선택</option>
-                        <option value="연차신청">연차 신청</option>
-                        <option value="출장신청">출장 신청</option>
-                        <option value="비품구매">비품 구매 요청</option>
-                        <option value="초과근무">초과근무 신청</option>
-                        <option value="기타">기타</option>
+                        <option value="INBOUND">입고 요청서</option>
+                        <option value="OUTBOUND">출고 요청서</option>
+                        <option value="STOCK_ADJ">재고 조정서</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>결재자 <span class="req">*</span></label>
-                    <select name="approverId" required onchange="updateApproverName(this)">
+                    <select name="approverId" id="approverId" required onchange="updateApprover(this)">
                         <option value="">결재자 선택</option>
-                        <%-- DB 연동 후 forEach로 교체 --%>
-                        <option value="MGR001">김팀장 (개발팀장)</option>
-                        <option value="MGR002">이부장 (영업부장)</option>
-                        <option value="MGR003">박이사 (인사이사)</option>
+                        <c:forEach items="${memberList}" var="m">
+                            <c:if test="${m.memberId != loginUser.memberId}">
+                                <option value="${m.memberId}">${m.name} (${m.memberId})</option>
+                            </c:if>
+                        </c:forEach>
                     </select>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
+                <div class="form-group full">
                     <label>제목 <span class="req">*</span></label>
                     <input type="text" name="title" id="docTitle" placeholder="결재 제목을 입력하세요" required>
                 </div>
-            </div>
-        </div>
-
-        <!-- 문서 내용 -->
-        <div class="form-section">
-            <div class="section-title">결재 내용</div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>상세 내용 <span class="req">*</span></label>
-                    <textarea name="content" placeholder="결재 내용을 상세히 입력하세요." required></textarea>
+                <div class="form-group" id="supplierGroup" style="display:none">
+                    <label>공급업체 (입고처)</label>
+                    <select name="supplierId">
+                        <option value="">선택 안함</option>
+                        <option value="1">한국식품유통(주)</option>
+                        <option value="2">글로벌전자부품률</option>
+                        <option value="3">대한소모품률주</option>
+                        <option value="4">원자재공급센터</option>
+                        <option value="5">기타상품도매(주)</option>
+                    </select>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="flex:1">
-                    <label>시작일</label>
-                    <input type="date" name="startDate">
-                </div>
-                <div class="form-group" style="flex:1">
-                    <label>종료일</label>
-                    <input type="date" name="endDate">
-                </div>
-                <div class="form-group" style="flex:1">
-                    <label>관련 금액 (원)</label>
-                    <input type="number" name="amount" placeholder="해당 시 입력">
+                <div class="form-group" id="customerGroup" style="display:none">
+                    <label>고객사 (출고처)</label>
+                    <select name="customerId">
+                        <option value="">선택 안함</option>
+                        <option value="1">마트코퍼인몰</option>
+                        <option value="2">편의점하거봄</option>
+                        <option value="3">온라인소핑C</option>
+                        <option value="4">지역마트D</option>
+                        <option value="5">도매슈퍼E</option>
+                    </select>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- 파일 첨부 -->
-        <div class="form-section">
-            <div class="section-title">첨부 파일 (선택)</div>
-            <div class="file-zone" onclick="document.getElementById('fileInput').click()">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
-                <p>클릭하여 파일 첨부 (최대 10MB)</p>
-            </div>
-            <input type="file" id="fileInput" name="attachFile" style="display:none">
+    <div class="section">
+        <div class="section-head">상품 목록 (여러 상품 추가 가능)</div>
+        <div class="section-body">
+            <table class="item-tbl">
+                <thead>
+                    <tr>
+                        <th style="width:28px">No</th>
+                        <th>상품명 / 코드</th>
+                        <th style="width:70px">수량</th>
+                        <th style="width:80px">단가</th>
+                        <th style="width:90px">비고</th>
+                        <th style="width:36px">삭제</th>
+                    </tr>
+                </thead>
+                <tbody id="itemBody">
+                    <tr>
+                        <td align="center">1</td>
+                        <td>
+                            <select name="productId">
+                                <option value="">상품 선택</option>
+                                <c:forEach items="${productList}" var="p">
+                                    <option value="${p.productId}">${p.productCode} / ${p.productName}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+                        <td><input type="number" name="qty" step="0.001" min="0" value="0"></td>
+                        <td><input type="number" name="unitCost" step="0.01" min="0" value="0"></td>
+                        <td><input type="text" name="itemRemarks" placeholder="비고"></td>
+                        <td align="center"><button type="button" class="btn-del-row" onclick="delRow(this)">✕</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn-add-row" onclick="addRow()">+ 상품 추가</button>
         </div>
+    </div>
 
-    </form>
+</form>
 </div>
 
-<!-- 하단 버튼 -->
-<div class="popup-footer">
+<div class="pop-foot">
     <button class="btn btn-outline" onclick="window.close()">취소</button>
-    <button class="btn btn-primary" onclick="submitForm()">결재 올리기</button>
+    <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">기안 올리기</button>
 </div>
 
 <script>
-// 결재자 이름 표시 업데이트
-function updateApproverName(sel) {
-    const name = sel.options[sel.selectedIndex].text.split(' ')[0];
-    document.getElementById('approverNameDisplay').innerText = sel.value ? name : '미지정';
+// 상품 목록 JS 배열 (동적 행 추가용)
+var PRODUCTS = [
+    <c:forEach items="${productList}" var="p" varStatus="s">
+    { id: <c:out value="${p.productId}"/>, code: '<c:out value="${p.productCode}"/>', name: '<c:out value="${p.productName}"/>' }<c:if test="${!s.last}">,</c:if>
+    </c:forEach>
+];
+
+function buildProductOptions() {
+    var html = '<option value="">상품 선택</option>';
+    PRODUCTS.forEach(function(p) {
+        html += '<option value="' + p.id + '">' + p.code + ' / ' + p.name + '</option>';
+    });
+    return html;
 }
 
-// 문서 유형 선택 시 제목 자동 입력
-function updateTitle(sel) {
-    const titleInput = document.getElementById('docTitle');
-    const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
-    if(sel.value && !titleInput.value) {
-        titleInput.value = today + ' ' + sel.value + ' - ${loginUser.name}';
+var rowCount = 1;
+
+function addRow() {
+    rowCount++;
+    var tbody = document.getElementById('itemBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+        '<td align="center">' + rowCount + '</td>' +
+        '<td><select name="productId">' + buildProductOptions() + '</select></td>' +
+        '<td><input type="number" name="qty" step="0.001" min="0" value="0"></td>' +
+        '<td><input type="number" name="unitCost" step="0.01" min="0" value="0"></td>' +
+        '<td><input type="text" name="itemRemarks" placeholder="비고"></td>' +
+        '<td align="center"><button type="button" class="btn-del-row" onclick="delRow(this)">✕</button></td>';
+    tbody.appendChild(tr);
+    updateRowNums();
+}
+
+function delRow(btn) {
+    if (document.querySelectorAll('#itemBody tr').length <= 1) {
+        alert('최소 1개 상품이 필요합니다.'); return;
+    }
+    btn.closest('tr').remove();
+    updateRowNums();
+}
+
+function updateRowNums() {
+    document.querySelectorAll('#itemBody tr').forEach(function(tr, i) {
+        tr.cells[0].textContent = i + 1;
+    });
+}
+
+function onDocTypeChange(sel) {
+    document.getElementById('supplierGroup').style.display = (sel.value === 'INBOUND')  ? '' : 'none';
+    document.getElementById('customerGroup').style.display = (sel.value === 'OUTBOUND') ? '' : 'none';
+    var title = document.getElementById('docTitle');
+    if (!title.value && sel.value) {
+        var today = new Date().toLocaleDateString('ko-KR');
+        var map = { INBOUND:'입고 요청서', OUTBOUND:'출고 요청서', STOCK_ADJ:'재고 조정서' };
+        title.value = today + ' ' + map[sel.value] + ' - ${loginUser.name}';
     }
 }
 
-// 제출
+function updateApprover(sel) {
+    var name = sel.value ? sel.options[sel.selectedIndex].text.split(' ')[0] : '미지정';
+    document.getElementById('approverDisplay').textContent = name;
+}
+
+// ★ AJAX로 제출 → "OK" 받으면 팝업 닫고 부모창 새로고침
 function submitForm() {
-    const form = document.getElementById('approvalForm');
-    if(!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    if(confirm('결재를 올리시겠습니까?')) {
-        form.submit();
-        // 제출 후 처리: approvalComplete.jsp에서 아래 코드 실행
-        // if(opener) opener.location.reload();
-        // window.close();
-    }
+    var docType    = document.getElementById('docType').value;
+    var approverId = document.getElementById('approverId').value;
+    var title      = document.getElementById('docTitle').value.trim();
+
+    if (!docType)    { alert('문서 유형을 선택하세요.'); return; }
+    if (!approverId) { alert('결재자를 선택하세요.');   return; }
+    if (!title)      { alert('제목을 입력하세요.');      return; }
+
+    var selects = document.querySelectorAll('select[name="productId"]');
+    var hasProduct = Array.from(selects).some(function(s) { return s.value !== ''; });
+    if (!hasProduct) { alert('상품을 1개 이상 선택하세요.'); return; }
+
+    if (!confirm('기안을 올리시겠습니까?')) return;
+
+    // FormData로 폼 데이터 수집
+    var form = document.getElementById('approvalForm');
+    var data = new FormData(form);
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '처리중...';
+
+    fetch('${pageContext.request.contextPath}/approval/insert.do', {
+        method: 'POST',
+        body: new URLSearchParams(data)  // application/x-www-form-urlencoded
+    })
+    .then(function(res) { return res.text(); })
+    .then(function(result) {
+        if (result === 'OK') {
+            alert('기안이 정상적으로 올라갔습니다.');
+            // 부모창 새로고침 후 팝업 닫기
+            if (opener && !opener.closed) {
+                opener.location.href = opener.location.origin + '${pageContext.request.contextPath}/approval/pending.do';
+            }
+            window.close();
+        } else {
+            alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+            btn.disabled = false;
+            btn.textContent = '기안 올리기';
+        }
+    })
+    .catch(function() {
+        alert('네트워크 오류가 발생했습니다.');
+        btn.disabled = false;
+        btn.textContent = '기안 올리기';
+    });
 }
 </script>
-
 </body>
 </html>
