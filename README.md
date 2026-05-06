@@ -68,7 +68,7 @@ sequenceDiagram
 
 <p>git add . </p>
 <p>git commit -m "feat: OOO 기능 구현 및 폼 UI 완성" </p>
-<p>git push origin feature/내기능이름 </p>
+<p>git push origin 자신이지정할브랜치이름 </p>
 
 <br>
 <h4>[4단계] 다른 팀원이 올린 최신 코드 반영하기</h4>
@@ -93,7 +93,7 @@ sequenceDiagram
 <p>git commit -m "chore: gitignore 세팅 및 불필요한 설정 파일 캐시 삭제"</p>
 
 <p>4. 깃허브에 올리기</p>
-<p>git push origin 현재브랜치명</p>
+<p>git push origin 자신이지정할브랜치이름</p>
 
 <br>
 <h3>💡 4. 자주 겪는 에러 및 해결법 </h3>
@@ -149,7 +149,7 @@ sequenceDiagram
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5ab35e8c-4d19-450b-9090-d4657d290cf0" />
 ## 판매 현황
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6f47ec7f-8e4a-4f13-9cae-31333dabf771" />
-## 재고 현황(연결 안됨)
+## 재고 현황(해결)
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b04841d1-e271-48ae-8bcc-9968ff412bcd" />
 
 <br><br>
