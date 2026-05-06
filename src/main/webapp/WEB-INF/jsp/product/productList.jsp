@@ -182,7 +182,7 @@ function onCategoryChange(selectEl) {
                 <div class="form-row">
                     <label>상품코드 *</label>
                     <input type="text" name="productCode" id="i_code"
-                           placeholder="카테고리를 먼저 선택하세요" required>
+                           placeholder="카테고리를 먼저 선택하세요" required readonly style="background:#F1F5F9; color:var(--muted); cursor:not-allowed;">
                 </div>
                 <div class="form-row">
                     <label>카테고리</label>
@@ -207,6 +207,11 @@ function onCategoryChange(selectEl) {
                 <div class="form-row"><label>발주기준점</label><input type="number" name="reorderPoint" step="0.001" min="0" value="0"></div>
                 <div class="form-row"><label>기본발주량</label><input type="number" name="reorderQty"   step="0.001" min="0" value="0"></div>
             </div>
+            <div class="form-row">
+                <label>초기 재고 수량 <span style="font-weight:400; color:var(--muted);">(기본 창고에 자동 배정)</span></label>
+                <input type="number" name="qtyOnHand" step="0.001" min="0" value="0"
+                       style="background:#F0F6FF; border-color:#BFDBFE;">
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" onclick="document.getElementById('insertModal').classList.remove('open')">취소</button>
                 <button type="submit" class="btn btn-primary">등록</button>
@@ -222,7 +227,7 @@ function onCategoryChange(selectEl) {
         <form method="post" action="${pageContext.request.contextPath}/product/update.do">
             <input type="hidden" name="productId" id="u_id">
             <div class="form-2col">
-                <div class="form-row"><label>상품코드</label><input type="text" name="productCode" id="u_code"></div>
+                <div class="form-row"><label>상품코드</label><input type="text" name="productCode" id="u_code" readonly style="background:#F1F5F9; color:var(--muted); cursor:not-allowed;"></div>
                 <div class="form-row"><label>카테고리</label>
                     <select name="category" id="u_cat">
                         <option value="식품">식품</option><option value="전자">전자</option>

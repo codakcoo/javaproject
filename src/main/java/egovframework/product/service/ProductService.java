@@ -39,4 +39,7 @@ public interface ProductService {
 
     // 자동 채번: 카테고리 선택 시 다음 상품코드 생성
     String          generateNextProductCode(String category);
+
+    // 기본 창고 ID 조회 (상품 등록 시 INVENTORY 자동 생성용)
+    Long            getDefaultWarehouseId();
 }

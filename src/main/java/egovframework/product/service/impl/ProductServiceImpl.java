@@ -32,9 +32,22 @@ public class ProductServiceImpl implements ProductService {
     @Override public List<ProductVO> getProductList(ProductVO vo)  { return productMapper.selectProductList(vo); }
     @Override public ProductVO       getProduct(Long productId)    { return productMapper.selectProduct(productId); }
     @Override public int             getProductCount(ProductVO vo) { return productMapper.selectProductCount(vo); }
-    @Override public void            addProduct(ProductVO vo)      { productMapper.insertProduct(vo); }
+    @Override public void            addProduct(ProductVO vo) {
+        // 1) PRODUCT 테이블 INSERT (useGeneratedKeys → vo.productId 채워짐)
+        productMapper.insertProduct(vo);
+        // 2) 기본 창고에 INVENTORY 레코드 자동 생성
+        Long defaultWid = productMapper.selectDefaultWarehouseId();
+        if (defaultWid != null) {
+            vo.setWarehouseId(defaultWid);
+            productMapper.insertInventory(vo);
+        }
+    }
     @Override public void            modifyProduct(ProductVO vo)   { productMapper.updateProduct(vo); }
-    @Override public void            removeProduct(Long productId) { productMapper.deleteProduct(productId); }
+    @Override public void            removeProduct(Long productId) {
+        productMapper.deleteInventoryByProductId(productId); // FK 제약 방지: INVENTORY 먼저 삭제
+        productMapper.deleteProduct(productId);
+    }
+    @Override public Long            getDefaultWarehouseId()       { return productMapper.selectDefaultWarehouseId(); }
 
     // ── 판매 현황 ───────────────────────────────────
     @Override public List<SalesVO>   getSalesList(SalesVO vo)     { return productMapper.selectSalesList(vo); }

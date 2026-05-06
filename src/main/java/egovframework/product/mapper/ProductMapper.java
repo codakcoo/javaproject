@@ -16,6 +16,7 @@ public interface ProductMapper {
     void            insertProduct(ProductVO vo);
     void            updateProduct(ProductVO vo);
     void            deleteProduct(Long productId);
+    void            deleteInventoryByProductId(Long productId);
 
     // 판매 현황 (SALES_ORDER)
     List<SalesVO>   selectSalesList(SalesVO vo);
@@ -38,4 +39,10 @@ public interface ProductMapper {
 
     // 자동 채번: 카테고리별 마지막 상품코드 조회
     String          selectLastProductCodeByCategory(String category);
+
+    // 기본 창고(DEFECT 제외, 첫 번째) 조회
+    Long            selectDefaultWarehouseId();
+
+    // INVENTORY 레코드 생성 (상품 등록 시)
+    void            insertInventory(ProductVO vo);
 }
