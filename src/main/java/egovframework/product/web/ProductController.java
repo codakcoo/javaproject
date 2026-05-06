@@ -147,14 +147,17 @@ public class ProductController {
                             Model model, HttpSession session) {
         if (isNotLoggedIn(session)) return "redirect:/login.do";
         vo.setIncludeDefect(includeDefect);
+        int lowStockCount  = productService.getLowStockCount();
+        int normalOnlyCount = productService.getStockCount(vo); // 불량 제외 전체 (검색 조건 반영)
         if ("Y".equals(includeDefect)) {
             model.addAttribute("stockList",  productService.getStockListAll(vo));
             model.addAttribute("totalCount", productService.getStockCountAll(vo));
         } else {
             model.addAttribute("stockList",  productService.getStockList(vo));
-            model.addAttribute("totalCount", productService.getStockCount(vo));
+            model.addAttribute("totalCount", normalOnlyCount);
         }
-        model.addAttribute("lowStockCount", productService.getLowStockCount());
+        model.addAttribute("lowStockCount",  lowStockCount);
+        model.addAttribute("normalCount",    normalOnlyCount - lowStockCount); // 불량 제외 정상 재고
         model.addAttribute("searchVO", vo);
         return "product/stockList";
     }

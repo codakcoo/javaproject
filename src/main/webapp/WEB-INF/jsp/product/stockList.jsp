@@ -81,7 +81,7 @@
         </div>
         <div class="sum-card">
             <div class="sum-label">정상 재고</div>
-            <div class="sum-value">${totalCount - lowStockCount}</div>
+            <div class="sum-value">${normalCount}</div>
             <div class="sum-unit">개 품목</div>
         </div>
     </div>
