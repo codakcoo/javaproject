@@ -255,12 +255,12 @@
                                 <div style="display:flex;gap:3px;justify-content:center">
                                     <button class="btn-sm btn-view" onclick="viewDoc(${doc.docId})">보기</button>
                                     <c:if test="${doc.status == 'PENDING'}">
-                                        <button class="btn-sm btn-progress" onclick="startReview(${doc.docId})">검토시작</button>
-                                        <button class="btn-sm btn-reject"   onclick="rejectDoc(${doc.docId})">반려</button>
+                                        <button class="btn-sm btn-progress" onclick="viewDoc(${doc.docId})">검토시작</button>
+                                        <button class="btn-sm btn-reject"   onclick="viewDoc(${doc.docId})">반려</button>
                                     </c:if>
                                     <c:if test="${doc.status == 'IN_PROGRESS'}">
-                                        <button class="btn-sm btn-approve" onclick="approveDoc(${doc.docId})">승인</button>
-                                        <button class="btn-sm btn-reject"  onclick="rejectDoc(${doc.docId})">반려</button>
+                                        <button class="btn-sm btn-approve" onclick="viewDoc(${doc.docId})">승인</button>
+                                        <button class="btn-sm btn-reject"  onclick="viewDoc(${doc.docId})">반려</button>
                                     </c:if>
                                     <c:if test="${doc.status == 'DRAFT'}">
                                         <button class="btn-sm btn-delete" onclick="deleteDoc(${doc.docId})">삭제</button>
@@ -359,33 +359,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-function startReview(docId) {
-    if (!confirm('검토를 시작하시겠습니까? (기안중 → 진행중)')) return;
-    fetch(ctx + '/approval/startReview.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId
-    }).then(() => location.reload());
-}
-
-function approveDoc(docId) {
-    if (!confirm('승인 처리하시겠습니까?')) return;
-    fetch(ctx + '/approval/approve.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId
-    }).then(() => location.reload());
-}
-
-function rejectDoc(docId) {
-    var reason = prompt('반려 사유를 입력하세요:');
-    if (!reason || !reason.trim()) return;
-    fetch(ctx + '/approval/reject.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId + '&rejectReason=' + encodeURIComponent(reason)
-    }).then(() => location.reload());
-}
+// 승인/반려는 상세 모달/페이지에서 처리 (viewDoc 호출)
 
 function deleteDoc(docId) {
     if (!confirm('삭제하시겠습니까?')) return;
