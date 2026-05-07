@@ -13,9 +13,10 @@
         border-right: 1px solid var(--border);
         overflow-y: auto; overflow-x: hidden;
         user-select: none;
+        z-index: 260;
+        transition: transform 0.25s ease;
     }
 
-    /* 상단 사용자 영역 */
     .sb-user {
         padding: 10px 14px 8px;
         border-bottom: 1px solid var(--border-lt);
@@ -24,7 +25,6 @@
     .sb-user-name { font-size: 12px; font-weight: 700; color: var(--text); }
     .sb-user-role { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
-    /* 메뉴 그룹 */
     .nav-group { border-bottom: 1px solid var(--border-lt); }
 
     .nav-group-title {
@@ -35,7 +35,6 @@
         border-bottom: 1px solid var(--border-lt);
     }
 
-    /* 메뉴 아이템 */
     .nav-item {
         display: flex; align-items: center; gap: 8px;
         padding: 7px 14px;
@@ -50,12 +49,8 @@
         background: var(--blue-lt); color: var(--blue);
         border-left-color: var(--blue); font-weight: 600;
     }
-    .nav-item svg {
-        width: 14px; height: 14px; flex-shrink: 0;
-        fill: currentColor; opacity: 0.75;
-    }
+    .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; fill: currentColor; opacity: 0.75; }
 
-    /* 토글 메뉴 */
     .nav-toggle { justify-content: space-between; }
     .nav-toggle .toggle-left { display: flex; align-items: center; gap: 8px; }
     .nav-toggle svg.arr {
@@ -65,7 +60,6 @@
     .nav-toggle.open svg.arr { transform: rotate(90deg); }
     .nav-toggle.open { color: var(--text-sm); font-weight: 600; }
 
-    /* 서브메뉴 */
     .nav-sub { display: none; background: #FAFAFA; }
     .nav-sub.open { display: block; }
     .nav-sub .nav-item {
@@ -76,21 +70,35 @@
     .nav-sub .nav-item:last-child { border-bottom: none; }
     .nav-sub .nav-item::before {
         content: ""; width: 4px; height: 4px;
-        background: var(--muted); border-radius: 50%;
-        flex-shrink: 0;
+        background: var(--muted); border-radius: 50%; flex-shrink: 0;
     }
-    .nav-sub .nav-item.active {
-        background: var(--blue-lt); color: var(--blue);
-        font-weight: 600;
-    }
+    .nav-sub .nav-item.active { background: var(--blue-lt); color: var(--blue); font-weight: 600; }
     .nav-sub .nav-item.active::before { background: var(--blue); }
 
-    /* 하단 버전 */
     .sb-ver {
-        padding: 8px 14px;
-        font-size: 10px; color: var(--muted);
-        border-top: 1px solid var(--border-lt);
-        background: #FAFAFA;
+        padding: 8px 14px; font-size: 10px; color: var(--muted);
+        border-top: 1px solid var(--border-lt); background: #FAFAFA;
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+        #sidebar {
+            /* 기본: 왼쪽으로 숨김 */
+            transform: translateX(-100%);
+            box-shadow: none;
+        }
+        /* 열린 상태 */
+        #sidebar.mobile-open {
+            transform: translateX(0);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+        }
+
+        /* 모바일에서 nav-item 터치 영역 확대 */
+        .nav-item { padding: 10px 14px; font-size: 13px; }
+        .nav-sub .nav-item { padding: 9px 14px 9px 34px; font-size: 12px; }
+        .nav-group-title { padding: 10px 14px 5px; font-size: 11px; }
+        .sb-user { padding: 14px 14px 10px; }
+        .sb-user-name { font-size: 13px; }
     }
 </style>
 
@@ -103,7 +111,8 @@
     <!-- 메인 -->
     <div class="nav-group">
         <a href="${pageContext.request.contextPath}/main.do"
-           class="nav-item <%= uri.contains("/main") ? "active" : "" %>">
+           class="nav-item <%= uri.contains("/main") ? "active" : "" %>"
+           onclick="closeSidebar()">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             대시보드
         </a>
@@ -120,13 +129,13 @@
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub <%= uri.contains("/hr") || uri.contains("/approval") ? "open" : "" %>" id="hrMenu">
+        <div class="nav-sub <%= uri.contains("/hr") ? "open" : "" %>" id="hrMenu">
             <a href="${pageContext.request.contextPath}/hr/list.do"
-               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>">직원 목록</a>
+               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>"
+               onclick="closeSidebar()">직원 목록</a>
             <a href="${pageContext.request.contextPath}/hr/dept.do"
-               class="nav-item <%= uri.contains("/hr/dept") ? "active" : "" %>">부서 관리</a>
-<%--             <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/approval") ? "active" : "" %>">전자결재</a> --%>
+               class="nav-item <%= uri.contains("/hr/dept") ? "active" : "" %>"
+               onclick="closeSidebar()">부서 관리</a>
         </div>
     </div>
 
@@ -143,53 +152,62 @@
         </div>
         <div class="nav-sub <%= uri.contains("/product") || uri.contains("/sales") || uri.contains("/stock") ? "open" : "" %>" id="productMenu">
             <a href="${pageContext.request.contextPath}/product/list.do"
-               class="nav-item <%= uri.contains("/product") ? "active" : "" %>">상품 관리</a>
+               class="nav-item <%= uri.contains("/product") ? "active" : "" %>"
+               onclick="closeSidebar()">상품 관리</a>
             <a href="${pageContext.request.contextPath}/sales/list.do"
-               class="nav-item <%= uri.contains("/sales") ? "active" : "" %>">판매 현황</a>
+               class="nav-item <%= uri.contains("/sales") ? "active" : "" %>"
+               onclick="closeSidebar()">판매 현황</a>
             <a href="${pageContext.request.contextPath}/stock/list.do"
-               class="nav-item <%= uri.contains("/stock") ? "active" : "" %>">재고 현황</a>
+               class="nav-item <%= uri.contains("/stock") ? "active" : "" %>"
+               onclick="closeSidebar()">재고 현황</a>
         </div>
     </div>
-    
+
     <!-- 결재관리 -->
     <div class="nav-group">
         <div class="nav-group-title">결재관리</div>
         <div class="nav-item nav-toggle <%= uri.contains("/approval") ? "open" : "" %>"
              onclick="toggleMenu('approvalMenu', this)">
             <div class="toggle-left">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 결재 관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub <%=uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
+        <div class="nav-sub <%= uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
             <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/list") ? "active" : "" %>">전체</a>
+               class="nav-item <%= uri.contains("/list") && uri.contains("/approval") ? "active" : "" %>"
+               onclick="closeSidebar()">총 결재</a>
             <a href="${pageContext.request.contextPath}/approval/pending.do"
-               class="nav-item <%= uri.contains("/pending") ? "active" : "" %>">요청</a>
-               <a href="${pageContext.request.contextPath}/approval/inProgress.do"
-               class="nav-item <%= uri.contains("/inProgress") ? "active" : "" %>">진행중</a>
+               class="nav-item <%= uri.contains("/pending") ? "active" : "" %>"
+               onclick="closeSidebar()">기안중</a>
+            <a href="${pageContext.request.contextPath}/approval/inProgress.do"
+               class="nav-item <%= uri.contains("/inProgress") ? "active" : "" %>"
+               onclick="closeSidebar()">진행중</a>
             <a href="${pageContext.request.contextPath}/approval/rejected.do"
-               class="nav-item <%= uri.contains("/rejected") ? "active" : "" %>">반려</a>
+               class="nav-item <%= uri.contains("/rejected") ? "active" : "" %>"
+               onclick="closeSidebar()">반려</a>
             <a href="${pageContext.request.contextPath}/approval/approved.do"
-               class="nav-item <%= uri.contains("/approved") ? "active" : "" %>">결재</a>
+               class="nav-item <%= uri.contains("/approved") ? "active" : "" %>"
+               onclick="closeSidebar()">결재</a>
         </div>
     </div>
-    
+
     <!-- 주문관리 -->
     <div class="nav-group">
         <div class="nav-group-title">주문관리</div>
-        <div class="nav-item nav-toggle <%= uri.contains("/approval") ? "open" : "" %>"
+        <div class="nav-item nav-toggle"
              onclick="toggleMenu('orderMenu', this)">
             <div class="toggle-left">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                 주문관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub <%=uri.contains("/approval") ? "open" : "" %>" id="orderMenu">
-            <a href="${pageContext.request.contextPath}/approval/list.do"
-               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>">영수증</a>
+        <div class="nav-sub" id="orderMenu">
+            <a href="${pageContext.request.contextPath}/order/receipt.do"
+               class="nav-item <%= uri.contains("/order") ? "active" : "" %>"
+               onclick="closeSidebar()">영수증</a>
         </div>
     </div>
 
@@ -198,10 +216,10 @@
 
 <script>
 function toggleMenu(menuId, btn) {
-    const menu = document.getElementById(menuId);
-    const isOpen = menu.classList.contains('open');
-    document.querySelectorAll('.nav-sub').forEach(m => m.classList.remove('open'));
-    document.querySelectorAll('.nav-toggle').forEach(b => b.classList.remove('open'));
+    var menu   = document.getElementById(menuId);
+    var isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.nav-sub').forEach(function(m) { m.classList.remove('open'); });
+    document.querySelectorAll('.nav-toggle').forEach(function(b) { b.classList.remove('open'); });
     if (!isOpen) {
         menu.classList.add('open');
         btn.classList.add('open');
