@@ -18,7 +18,25 @@
     .btn-primary { background:var(--blue); color:white; } .btn-primary:hover { opacity:0.85; }
     .btn-outline { background:var(--surface); color:var(--text); border:1px solid var(--border); } .btn-outline:hover { background:var(--bg); }
     .ml-auto { margin-left:auto; }
-    .table-wrap { background:var(--surface); border:1px solid var(--border); overflow:hidden; }
+    .table-wrap { background:var(--surface); border:1px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table { min-width: 700px; }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+        table { min-width: 600px; }
+        thead th { font-size: 11px; padding: 7px 8px; }
+        tbody td  { font-size: 11px; padding: 7px 8px; }
+        /* 모달: 모바일에서 하단 시트처럼 */
+        .modal-bg { align-items: flex-end !important; }
+        .modal {
+            width: 100% !important;
+            max-width: 100vw !important;
+            max-height: 85vh !important;
+            overflow-y: auto !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 20px 16px !important;
+        }
+    }
     .table-head { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); }
     .table-head span { font-size:13px; font-weight:600; }
     .cnt-badge { background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:1px 9px; font-size:11px; color:var(--muted); }
@@ -102,7 +120,7 @@ function onCategoryChange(selectEl) {
             <div class="page-title">상품 관리</div>
             <div class="page-sub">영업/재고 &gt; 상품 관리</div>
         </div>
-        <button class="btn btn-primary" onclick="document.getElementById('insertModal').classList.add('open')">+ 상품 등록</button>
+        <button class="btn btn-primary" onclick="openInsertModal()">+ 상품 등록</button>
     </div>
 
     <form method="get" action="${pageContext.request.contextPath}/product/list.do">
@@ -279,6 +297,11 @@ function doDelete(id,name){
     document.getElementById('del_id').value=id;
     document.getElementById('deleteForm').submit();
 }
+// PC: 모달, 모바일: 전체화면 모달
+function openInsertModal() {
+    document.getElementById('insertModal').classList.add('open');
+}
+
 document.querySelectorAll('.modal-bg').forEach(bg=>{
     bg.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
 });

@@ -53,8 +53,18 @@
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 12px;
-        overflow: hidden;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+        .table-card { border-radius: 6px; }
+        table { min-width: 620px; }
+        thead th { font-size: 11px; padding: 8px 10px; }
+        tbody td  { font-size: 11px; padding: 8px 10px; }
+        .table-card-head { padding: 10px 12px; }
     }
 
     .table-card-head {
@@ -269,13 +279,15 @@ function deleteEmp(empId) {
     }
 }
 
-// 전자결재 팝업
+// 전자결재 팝업 (PC: 모달, 모바일: 페이지 이동)
 function openApproval(empId) {
-    window.open(
-        '${pageContext.request.contextPath}/approval/form.do?empId=' + empId,
-        'approvalPopup',
-        'width=720,height=640,top=100,left=300,scrollbars=yes,resizable=no'
-    );
+    var url = '${pageContext.request.contextPath}/approval/form.do?empId=' + empId;
+    if (window.innerWidth <= 768) {
+        location.href = url;
+    } else {
+        window.open(url, 'approvalPopup',
+            'width=720,height=640,top=100,left=300,scrollbars=yes,resizable=no');
+    }
 }
 </script>
 

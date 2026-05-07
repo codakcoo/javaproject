@@ -23,7 +23,15 @@
     .btn { height:32px; padding:0 14px; font-size:12px; font-family:inherit; font-weight:500; cursor:pointer; border:none; display:inline-flex; align-items:center; gap:5px; text-decoration:none; transition:opacity 0.15s; }
     .btn-primary { background:var(--blue); color:white; } .btn-primary:hover { opacity:0.85; }
     .btn-outline { background:var(--surface); color:var(--text); border:1px solid var(--border); } .btn-outline:hover { background:var(--bg); }
-    .table-wrap { background:var(--surface); border:1px solid var(--border); overflow:hidden; }
+    .table-wrap { background:var(--surface); border:1px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table { min-width: 700px; }
+
+    @media (max-width: 768px) {
+        table { min-width: 620px; }
+        thead th { font-size: 11px; padding: 7px 8px; }
+        tbody td  { font-size: 11px; padding: 7px 8px; }
+        .stock-bar { min-width: 60px !important; }
+    }
     .table-head { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); }
     .table-head span { font-size:13px; font-weight:600; }
     .cnt-badge { background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:1px 9px; font-size:11px; color:var(--muted); }
