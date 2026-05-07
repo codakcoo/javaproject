@@ -50,7 +50,39 @@
     .search-bar select:focus, .search-bar input:focus { border-color: var(--blue); }
 
     /* ── 테이블 ── */
-    .tbl-wrap { border: 1px solid var(--border); overflow: auto; background: var(--surface); }
+    .tbl-wrap {
+        border: 1px solid var(--border); overflow-x: auto;
+        -webkit-overflow-scrolling: touch; background: var(--surface);
+    }
+    .tbl { min-width: 700px; } /* 모바일 가로 스와이프용 최소 너비 */
+
+    /* ── 모달 ── */
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; z-index: 400;
+        background: rgba(0,0,0,0.5);
+        align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+        background: white; width: 780px; max-width: 95vw;
+        max-height: 90vh; border-radius: 4px;
+        display: flex; flex-direction: column;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        overflow: hidden;
+    }
+    .modal-iframe {
+        border: none; flex: 1;
+        min-height: 640px;
+    }
+
+    /* ── 모바일 반응형 ── */
+    @media (max-width: 768px) {
+        .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab-item { white-space: nowrap; flex-shrink: 0; padding: 8px 10px; }
+        .tbl { min-width: 600px; }
+        .tbl thead th, .tbl tbody td { font-size: 11px; padding: 5px 6px; }
+        .btn-sm { font-size: 10px; height: 20px; padding: 0 5px; }
+    }
     .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
     .tbl thead th {
         background: #F5F5F5; border: 1px solid #CCCCCC;
@@ -223,12 +255,12 @@
                                 <div style="display:flex;gap:3px;justify-content:center">
                                     <button class="btn-sm btn-view" onclick="viewDoc(${doc.docId})">보기</button>
                                     <c:if test="${doc.status == 'PENDING'}">
-                                        <button class="btn-sm btn-progress" onclick="startReview(${doc.docId})">검토시작</button>
-                                        <button class="btn-sm btn-reject"   onclick="rejectDoc(${doc.docId})">반려</button>
+                                        <button class="btn-sm btn-progress" onclick="viewDoc(${doc.docId})">검토시작</button>
+                                        <button class="btn-sm btn-reject"   onclick="viewDoc(${doc.docId})">반려</button>
                                     </c:if>
                                     <c:if test="${doc.status == 'IN_PROGRESS'}">
-                                        <button class="btn-sm btn-approve" onclick="approveDoc(${doc.docId})">승인</button>
-                                        <button class="btn-sm btn-reject"  onclick="rejectDoc(${doc.docId})">반려</button>
+                                        <button class="btn-sm btn-approve" onclick="viewDoc(${doc.docId})">승인</button>
+                                        <button class="btn-sm btn-reject"  onclick="viewDoc(${doc.docId})">반려</button>
                                     </c:if>
                                     <c:if test="${doc.status == 'DRAFT'}">
                                         <button class="btn-sm btn-delete" onclick="deleteDoc(${doc.docId})">삭제</button>
@@ -245,46 +277,89 @@
 
 </main>
 
+<!-- ── PC 모달 (결재 문서 작성) ── -->
+<div class="modal-overlay" id="formModal" onclick="closeFormModal(event)">
+    <div class="modal-box">
+        <iframe id="formIframe" class="modal-iframe" src=""></iframe>
+    </div>
+</div>
+
+<!-- ── PC 모달 (결재 문서 상세) ── -->
+<div class="modal-overlay" id="detailModal" onclick="closeDetailModal(event)">
+    <div class="modal-box">
+        <iframe id="detailIframe" class="modal-iframe" src=""></iframe>
+    </div>
+</div>
+
 <script>
 const ctx = '${pageContext.request.contextPath}';
+const isMobile = () => window.innerWidth <= 768;
 
+/* ── 결재 문서 작성 ── */
 function openForm() {
-    window.open(ctx + '/approval/form.do', 'approvalForm',
-        'width=760,height=680,top=80,left=280,scrollbars=yes,resizable=no');
+    if (isMobile()) {
+        // 모바일: 페이지 이동
+        location.href = ctx + '/approval/form.do';
+    } else {
+        // PC: 모달
+        document.getElementById('formIframe').src = ctx + '/approval/form.do';
+        document.getElementById('formModal').classList.add('active');
+    }
 }
 
+/* 모달 외부 클릭 시 닫기 */
+function closeFormModal(e) {
+    if (e.target.id === 'formModal') {
+        document.getElementById('formModal').classList.remove('active');
+        document.getElementById('formIframe').src = '';
+        location.reload(); // 기안 올린 경우 목록 새로고침
+    }
+}
+
+/* iframe 내부(approvalForm)에서 호출: 기안 완료 후 모달 닫기 */
+function onFormComplete() {
+    document.getElementById('formModal').classList.remove('active');
+    document.getElementById('formIframe').src = '';
+    location.reload();
+}
+
+/* ── 결재 상세 보기 ── */
 function viewDoc(docId) {
-    window.open(ctx + '/approval/detail.do?docId=' + docId, 'approvalDetail',
-        'width=760,height=680,top=80,left=280,scrollbars=yes,resizable=no');
+    if (isMobile()) {
+        location.href = ctx + '/approval/detail.do?docId=' + docId;
+    } else {
+        document.getElementById('detailIframe').src = ctx + '/approval/detail.do?docId=' + docId;
+        document.getElementById('detailModal').classList.add('active');
+    }
 }
 
-function startReview(docId) {
-    if (!confirm('검토를 시작하시겠습니까? (기안중 → 진행중)')) return;
-    fetch(ctx + '/approval/startReview.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId
-    }).then(() => location.reload());
+function closeDetailModal(e) {
+    if (e.target.id === 'detailModal') {
+        document.getElementById('detailModal').classList.remove('active');
+        document.getElementById('detailIframe').src = '';
+        location.reload();
+    }
 }
 
-function approveDoc(docId) {
-    if (!confirm('승인 처리하시겠습니까?')) return;
-    fetch(ctx + '/approval/approve.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId
-    }).then(() => location.reload());
+/* iframe 내부(approvalDetail)에서 호출 */
+function onDetailComplete() {
+    document.getElementById('detailModal').classList.remove('active');
+    document.getElementById('detailIframe').src = '';
+    location.reload();
 }
 
-function rejectDoc(docId) {
-    const reason = prompt('반려 사유를 입력하세요:');
-    if (!reason || !reason.trim()) return;
-    fetch(ctx + '/approval/reject.do', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'docId=' + docId + '&rejectReason=' + encodeURIComponent(reason)
-    }).then(() => location.reload());
-}
+/* ESC 키로 모달 닫기 */
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.getElementById('formModal').classList.remove('active');
+        document.getElementById('detailModal').classList.remove('active');
+        document.getElementById('formIframe').src   = '';
+        document.getElementById('detailIframe').src = '';
+        location.reload();
+    }
+});
+
+// 승인/반려는 상세 모달/페이지에서 처리 (viewDoc 호출)
 
 function deleteDoc(docId) {
     if (!confirm('삭제하시겠습니까?')) return;
