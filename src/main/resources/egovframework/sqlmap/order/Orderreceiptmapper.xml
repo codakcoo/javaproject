@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.order.mapper.OrderReceiptMapper">
+
+    <!-- ── ResultMap ─────────────────────────── -->
+    <resultMap id="receiptResultMap" type="egovframework.order.vo.OrderReceiptVO">
+        <id     property="receiptId"    column="receipt_id"/>
+        <result property="receiptNo"    column="receipt_no"/>
+        <result property="docId"        column="doc_id"/>
+        <result property="docType"      column="doc_type"/>
+        <result property="orderDate"    column="order_date"/>
+        <result property="partnerName"  column="partner_name"/>
+        <result property="requesterId"  column="requester_id"/>
+        <result property="approverId"   column="approver_id"/>
+        <result property="totalAmount"  column="total_amount"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="requesterName" column="requester_name"/>
+        <result property="approverName"  column="approver_name"/>
+        <result property="docNo"        column="doc_no"/>
+    </resultMap>
+
+    <resultMap id="itemResultMap" type="egovframework.order.vo.OrderReceiptItemVO">
+        <id     property="itemId"      column="item_id"/>
+        <result property="receiptId"   column="receipt_id"/>
+        <result property="productId"   column="product_id"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="unit"        column="unit"/>
+        <result property="qty"         column="qty"/>
+        <result property="unitCost"    column="unit_cost"/>
+        <result property="amount"      column="amount"/>
+    </resultMap>
+
+    <!-- ── 목록 조회 ─────────────────────────── -->
+    <select id="selectReceiptList"
+            parameterType="egovframework.order.vo.OrderReceiptVO"
+            resultMap="receiptResultMap">
+        SELECT r.receipt_id, r.receipt_no, r.doc_id, r.doc_type,
+               DATE_FORMAT(r.order_date, '%Y-%m-%d %H:%i') AS order_date,
+               r.partner_name, r.requester_id, r.approver_id,
+               r.total_amount,
+               DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i') AS created_at,
+               req.name AS requester_name,
+               apr.name AS approver_name,
+               d.doc_no
+        FROM   order_receipt r
+        LEFT JOIN member       req ON r.requester_id = req.member_id
+        LEFT JOIN member       apr ON r.approver_id  = apr.member_id
+        LEFT JOIN approval_doc d   ON r.doc_id       = d.doc_id
+        <where>
+            <if test="searchDocType != null and searchDocType != ''">
+                r.doc_type = #{searchDocType}
+            </if>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (r.receipt_no    LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR r.partner_name  LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+        </where>
+        ORDER BY r.created_at DESC
+    </select>
+
+    <!-- ── 건수 ──────────────────────────────── -->
+    <select id="selectReceiptCount"
+            parameterType="egovframework.order.vo.OrderReceiptVO"
+            resultType="int">
+        SELECT COUNT(*) FROM order_receipt r
+        <where>
+            <if test="searchDocType != null and searchDocType != ''">
+                r.doc_type = #{searchDocType}
+            </if>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (r.receipt_no   LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR r.partner_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 상세 조회 ──────────────────────────── -->
+    <select id="selectReceipt" parameterType="long" resultMap="receiptResultMap">
+        SELECT r.receipt_id, r.receipt_no, r.doc_id, r.doc_type,
+               DATE_FORMAT(r.order_date, '%Y-%m-%d %H:%i') AS order_date,
+               r.partner_name, r.requester_id, r.approver_id,
+               r.total_amount,
+               DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i') AS created_at,
+               req.name AS requester_name,
+               apr.name AS approver_name,
+               d.doc_no
+        FROM   order_receipt r
+        LEFT JOIN member       req ON r.requester_id = req.member_id
+        LEFT JOIN member       apr ON r.approver_id  = apr.member_id
+        LEFT JOIN approval_doc d   ON r.doc_id       = d.doc_id
+        WHERE  r.receipt_id = #{receiptId}
+    </select>
+
+    <!-- ── 상품 라인 조회 ────────────────────── -->
+    <select id="selectReceiptItems" parameterType="long" resultMap="itemResultMap">
+        SELECT item_id, receipt_id, product_id,
+               product_code, product_name, unit,
+               qty, unit_cost, amount
+        FROM   order_receipt_item
+        WHERE  receipt_id = #{receiptId}
+        ORDER BY item_id
+    </select>
+
+    <!-- ── 주문 등록 ──────────────────────────── -->
+    <insert id="insertReceipt"
+            parameterType="egovframework.order.vo.OrderReceiptVO"
+            useGeneratedKeys="true" keyProperty="receiptId">
+        INSERT INTO order_receipt
+            (receipt_no, doc_id, doc_type, order_date,
+             partner_name, requester_id, approver_id, total_amount, created_at)
+        VALUES
+            (#{receiptNo}, #{docId}, #{docType}, NOW(),
+             #{partnerName}, #{requesterId}, #{approverId}, #{totalAmount}, NOW())
+    </insert>
+
+    <!-- ── 상품 라인 등록 ────────────────────── -->
+    <insert id="insertReceiptItem"
+            parameterType="egovframework.order.vo.OrderReceiptItemVO">
+        INSERT INTO order_receipt_item
+            (receipt_id, product_id, product_code, product_name, unit, qty, unit_cost, amount)
+        VALUES
+            (#{receiptId}, #{productId}, #{productCode}, #{productName},
+             #{unit}, #{qty}, #{unitCost}, #{amount})
+    </insert>
+
+    <!-- ── doc_id로 중복 체크 ───────────────── -->
+    <select id="countByDocId" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM order_receipt WHERE doc_id = #{docId}
+    </select>
+
+</mapper>
