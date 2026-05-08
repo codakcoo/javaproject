@@ -120,6 +120,22 @@
 
     /* 빈 데이터 */
     .empty-row td { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+    
+    .search-card input, .search-card select {
+    height: 36px; padding: 0 12px;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    font-size: 13px; font-family: inherit; color: var(--text);
+    outline: none; background: #EFF6FF;
+    transition: border-color 0.2s;
+}
+.search-card input:focus, .search-card select:focus {
+    border-color: #1D4ED8;
+    background: #DBEAFE;
+}
+.search-card input::placeholder {
+    color: #93C5FD;
+}
 </style>
 
 <main id="content">
@@ -137,18 +153,12 @@
     <!-- 검색 -->
     <form action="${pageContext.request.contextPath}/hr/list.do" method="get">
     <div class="search-card">
-        <select name="deptId">
-            <option value="">전체 부서</option>
-            <%-- DB 연동 후 아래 주석 해제 --%>
-            <%--
-            <c:forEach items="${deptList}" var="dept">
-                <option value="${dept.deptId}" <c:if test="${param.deptId == dept.deptId}">selected</c:if>>${dept.deptName}</option>
-            </c:forEach>
-            --%>
-            <option value="D001">개발팀</option>
-            <option value="D002">영업팀</option>
-            <option value="D003">인사팀</option>
-        </select>
+	<select name="deptId" onchange="this.form.submit()">
+    		<option value="">전체 부서</option>
+  	  		<option value="D001" ${deptId == 'D001' ? 'selected' : ''}>개발팀</option>
+  	 	  		<option value="D002" ${deptId == 'D002' ? 'selected' : ''}>인사팀</option>
+	     		<option value="D003" ${deptId == 'D003' ? 'selected' : ''}>영업팀</option>
+	 </select>
         <select name="status">
             <option value="">전체 상태</option>
             <option value="ACTIVE"  <c:if test="${param.status == 'ACTIVE'}">selected</c:if>>재직</option>
@@ -168,103 +178,55 @@
             <span class="total-badge">총 <strong>${empty empList ? '0' : empList.size()}</strong>명</span>
         </div>
         <table>
-            <thead>
-                <tr>
-                    <th>사번</th>
-                    <th>이름</th>
-                    <th>부서</th>
-                    <th>직급</th>
-                    <th>입사일</th>
-                    <th>연락처</th>
-                    <th>상태</th>
-                    <th>관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:choose>
-                    <c:when test="${empty empList}">
-                        <%-- 데이터 없을 때 (DB 연동 전 임시 샘플) --%>
-                        <tr>
-                            <td>EMP001</td>
-                            <td>홍길동</td>
-                            <td>개발팀</td>
-                            <td>과장</td>
-                            <td>2022-03-02</td>
-                            <td>010-1234-5678</td>
-                            <td><span class="status-badge status-active">재직</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-edit" onclick="location.href='${pageContext.request.contextPath}/hr/updateForm.do?empId=EMP001'">수정</button>
-                                    <button class="btn-approval" onclick="openApproval('EMP001')">결재</button>
-                                    <button class="btn-del" onclick="deleteEmp('EMP001')">삭제</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EMP002</td>
-                            <td>김철수</td>
-                            <td>영업팀</td>
-                            <td>대리</td>
-                            <td>2023-01-09</td>
-                            <td>010-9876-5432</td>
-                            <td><span class="status-badge status-active">재직</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-edit" onclick="location.href='${pageContext.request.contextPath}/hr/updateForm.do?empId=EMP002'">수정</button>
-                                    <button class="btn-approval" onclick="openApproval('EMP002')">결재</button>
-                                    <button class="btn-del" onclick="deleteEmp('EMP002')">삭제</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EMP003</td>
-                            <td>이영희</td>
-                            <td>인사팀</td>
-                            <td>차장</td>
-                            <td>2020-07-01</td>
-                            <td>010-5555-7777</td>
-                            <td><span class="status-badge status-leave">휴직</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-edit" onclick="location.href='${pageContext.request.contextPath}/hr/updateForm.do?empId=EMP003'">수정</button>
-                                    <button class="btn-approval" onclick="openApproval('EMP003')">결재</button>
-                                    <button class="btn-del" onclick="deleteEmp('EMP003')">삭제</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </c:when>
-                    <c:otherwise>
-                        <%-- DB 연동 후 실제 데이터 --%>
-                        <c:forEach items="${empList}" var="emp">
-                        <tr>
-                            <td>${emp.empId}</td>
-                            <td>${emp.empName}</td>
-                            <td>${emp.deptName}</td>
-                            <td>${emp.position}</td>
-                            <td>${emp.hireDate}</td>
-                            <td>${emp.phone}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${emp.status == 'ACTIVE'}"><span class="status-badge status-active">재직</span></c:when>
-                                    <c:when test="${emp.status == 'LEAVE'}"><span class="status-badge status-leave">휴직</span></c:when>
-                                    <c:otherwise><span class="status-badge status-resign">퇴직</span></c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-edit" onclick="location.href='${pageContext.request.contextPath}/hr/updateForm.do?empId=${emp.empId}'">수정</button>
-                                    <button class="btn-approval" onclick="openApproval('${emp.empId}')">결재</button>
-                                    <form action="${pageContext.request.contextPath}/hr/delete.do" method="post" style="display:inline">
-                                        <input type="hidden" name="empId" value="${emp.empId}">
-                                        <button type="submit" class="btn-del" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        </c:forEach>
-                    </c:otherwise>
-                </c:choose>
-            </tbody>
+         <thead>
+    <tr>
+        <th>사번</th>
+        <th>이름</th>
+        <th>부서</th>
+        <th>직급</th>
+        <th>이메일</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>관리</th>
+    </tr>
+</thead>
+           <tbody>
+    <c:choose>
+        <c:when test="${empty empList}">
+            <tr>
+                <td colspan="8" style="text-align:center; padding:48px; color:#999;">
+                    등록된 직원이 없습니다.
+                </td>
+            </tr>
+        </c:when>
+        <c:otherwise>
+            <c:forEach items="${empList}" var="emp">
+            <tr>
+                <td>${emp.empNo}</td>
+                <td>${emp.name}</td>
+                <td>${emp.department}</td>
+                <td>${emp.position}</td>
+                <td>${emp.email}</td>
+                <td>${emp.phone}</td>
+                <td>
+                    <span class="status-badge status-active">재직</span>
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-edit"
+                            onclick="location.href='${pageContext.request.contextPath}/hr/updateForm.do?memberId=${emp.memberId}'">수정</button>
+                        <form action="${pageContext.request.contextPath}/hr/delete.do" method="post" style="display:inline">
+                            <input type="hidden" name="memberId" value="${emp.memberId}">
+                            <button type="submit" class="btn-del"
+                                onclick="return confirm('${emp.name}님을 삭제하시겠습니까?')">삭제</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </c:forEach>
+        </c:otherwise>
+    </c:choose>
+</tbody>
         </table>
     </div>
 

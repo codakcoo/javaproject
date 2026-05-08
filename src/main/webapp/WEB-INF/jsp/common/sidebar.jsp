@@ -136,6 +136,9 @@
             <a href="${pageContext.request.contextPath}/hr/dept.do"
                class="nav-item <%= uri.contains("/hr/dept") ? "active" : "" %>"
                onclick="closeSidebar()">부서 관리</a>
+            <a href="${pageContext.request.contextPath}/hr/approval.do"
+      	 	   class="nav-item <%= uri.contains("/hr/approval") ? "active" : "" %>"
+      	       onclick="closeSidebar()">가입 승인 관리</a>
         </div>
     </div>
 
