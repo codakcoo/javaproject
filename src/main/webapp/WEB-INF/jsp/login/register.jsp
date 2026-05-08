@@ -64,6 +64,24 @@
             font-size: 13px; color: var(--muted); text-decoration: none;
         }
         .back-link:hover { color: var(--primary); }
+        <!-- 약관 박스 스타일 -->
+        .terms-box {
+    border: 1px solid #ddd;
+    padding: 12px;
+    height: 100px;
+    overflow-y: scroll;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+.terms-label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -90,11 +108,57 @@
         </div>
         <div class="field">
             <label>이메일</label>
-            <input type="text" name="email" placeholder="이메일을 입력하세요">
+            <input type="email" name="email" placeholder="이메일을 입력하세요" required>
         </div>
-        <button type="submit" class="btn">가입하기</button>
+        <div class="field">
+            <label>생년월일</label>
+            <input type="date" name="birthDate" required>
+        </div>
+        <div class="field">
+            <label>전화번호</label>
+            <input type="text" name="phone" placeholder="010-0000-0000" required>
+        </div>
+        <div class="field">
+            <label>성별</label>
+            <select name="gender" required>
+                <option value="">선택하세요</option>
+                <option value="M">남성</option>
+                <option value="F">여성</option>
+            </select>
+        </div>
+    	<div class="field">
+    		<label>부서</label>
+    	 <select name="department" required>
+        <option value="">부서를 선택하세요</option>
+        <option value="개발팀">개발팀</option>
+        <option value="인사팀">인사팀</option>
+        <option value="영업팀">영업팀</option>
+    </select>
+		</div>
+        <!-- 약관동의 -->
+        <div class="field">
+            <div class="terms-box">
+                <p><strong>이용약관</strong></p>
+                <p>본 ERP 시스템은 사내 업무용으로만 사용 가능합니다.</p>
+                <p>개인정보는 인사팀에서 관리하며 외부에 공개되지 않습니다.</p>
+                <p>가입 신청 후 인사팀 승인이 완료되어야 로그인이 가능합니다.</p>
+            </div>
+            <label class="terms-label">
+                <input type="checkbox" id="agreeCheck" name="agree" value="true">
+                위 약관에 동의합니다 (필수)
+            </label>
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn" disabled>가입하기</button>
     </form>
     <a href="${pageContext.request.contextPath}/login.do" class="back-link">로그인으로 돌아가기</a>
 </div>
+
+<!-- 약관 체크 시 버튼 활성화 -->
+<script>
+    document.getElementById('agreeCheck').addEventListener('change', function() {
+        document.getElementById('submitBtn').disabled = !this.checked;
+    });
+</script>
 </body>
 </html>
