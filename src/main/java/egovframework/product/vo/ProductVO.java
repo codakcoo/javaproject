@@ -26,6 +26,14 @@ public class ProductVO {
     private String searchCategory;
     private String includeDefect;   // "Y" 이면 불량창고 포함 조회
 
+    // ── stock_movement INSERT 용 임시 필드 ──────────────
+    private double qtyDelta;        // 변동 수량 (+입고, -출고)
+    private String movementType;    // INBOUND / OUTBOUND / ADJUST
+    private Long   refOrderId;      // 연결 주문 ID (order_receipt)
+    private String refOrderType;    // PO / SO / ADJ
+    private String remarks;         // 비고
+    private String createdBy;       // 처리 담당자
+
     // getters / setters
     public Long   getProductId()              { return productId; }
     public void   setProductId(Long v)        { this.productId = v; }
@@ -63,4 +71,18 @@ public class ProductVO {
     public void   setSearchCategory(String v) { this.searchCategory = v; }
     public String getIncludeDefect()          { return includeDefect; }
     public void   setIncludeDefect(String v)  { this.includeDefect = v; }
+
+    public double getQtyDelta()             { return qtyDelta; }
+    public void   setQtyDelta(double v)     { this.qtyDelta = v; }
+    public String getMovementType()         { return movementType; }
+    public void   setMovementType(String v) { this.movementType = v; }
+    public Long   getRefOrderId()           { return refOrderId; }
+    public void   setRefOrderId(Long v)     { this.refOrderId = v; }
+    public String getRefOrderType()         { return refOrderType; }
+    public void   setRefOrderType(String v) { this.refOrderType = v; }
+    public String getRemarks()              { return remarks; }
+    public void   setRemarks(String v)      { this.remarks = v; }
+    public String getCreatedBy()            { return createdBy; }
+    public void   setCreatedBy(String v)    { this.createdBy = v; }
+
 }
