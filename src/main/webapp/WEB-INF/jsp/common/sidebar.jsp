@@ -180,7 +180,7 @@
         <div class="nav-sub <%= uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
             <a href="${pageContext.request.contextPath}/approval/list.do"
                class="nav-item <%= uri.contains("/list") && uri.contains("/approval") ? "active" : "" %>"
-               onclick="closeSidebar()">총 결재</a>
+               onclick="closeSidebar()">전체</a>
             <a href="${pageContext.request.contextPath}/approval/pending.do"
                class="nav-item <%= uri.contains("/pending") ? "active" : "" %>"
                onclick="closeSidebar()">기안중</a>

@@ -129,9 +129,66 @@
             .item-tbl input, .item-tbl select { height: 30px; font-size: 11px; }
             .btn { height: 36px; font-size: 13px; }
         }
+
+        /* ── 공통 커스텀 다이얼로그 ── */
+        .dlg-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.45);
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .dlg-overlay.show { display: flex; }
+        .dlg-box {
+            background: white; border-radius: 8px; padding: 24px 20px 16px;
+            width: 100%; max-width: 300px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            animation: dlgIn 0.15s ease;
+            text-align: center;
+        }
+        @keyframes dlgIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .dlg-icon { font-size: 32px; margin-bottom: 10px; }
+        .dlg-title { font-size: 14px; font-weight: 700; color: #222; margin-bottom: 6px; }
+        .dlg-msg   { font-size: 12px; color: #666; margin-bottom: 16px; line-height: 1.6; }
+        .dlg-btns  { display: flex; gap: 8px; justify-content: center; }
+        .dlg-btn {
+            flex: 1; height: 36px; border-radius: 4px; font-size: 13px;
+            font-family: inherit; font-weight: 600; cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .dlg-btn.cancel  { background: #F5F5F5; color: #555; border-color: #CCC; }
+        .dlg-btn.primary { background: #0066CC; color: white; border-color: #0055AA; }
+        .dlg-btn.success { background: #059669; color: white; border-color: #047857; }
+        .dlg-btn.danger  { background: #E11D48; color: white; border-color: #BE123C; }
     </style>
 </head>
 <body>
+
+<!-- ── 알림 다이얼로그 (alert 대체) ── -->
+<div class="dlg-overlay" id="dlgAlert">
+    <div class="dlg-box">
+        <div class="dlg-icon" id="dlgAlertIcon">⚠️</div>
+        <div class="dlg-title" id="dlgAlertTitle">알림</div>
+        <div class="dlg-msg" id="dlgAlertMsg"></div>
+        <div class="dlg-btns">
+            <button class="dlg-btn primary" onclick="closeDlgAlert()">확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── 확인 다이얼로그 (confirm 대체) ── -->
+<div class="dlg-overlay" id="dlgConfirm">
+    <div class="dlg-box">
+        <div class="dlg-icon">📋</div>
+        <div class="dlg-title">기안 확인</div>
+        <div class="dlg-msg">결재를 기안하시겠습니까?<br>기안 후에는 수정할 수 없습니다.</div>
+        <div class="dlg-btns">
+            <button class="dlg-btn cancel"   onclick="closeDlgConfirm(false)">취소</button>
+            <button class="dlg-btn primary"  onclick="closeDlgConfirm(true)">기안 올리기</button>
+        </div>
+    </div>
+</div>
 
 <!-- 헤더 -->
 <div class="pop-head">
@@ -263,6 +320,28 @@
 </div>
 
 <script>
+
+/* ── 커스텀 다이얼로그 제어 ── */
+var _confirmCallback = null;
+
+function showDlgAlert(msg, icon, title) {
+    document.getElementById('dlgAlertIcon').textContent  = icon  || '⚠️';
+    document.getElementById('dlgAlertTitle').textContent = title || '알림';
+    document.getElementById('dlgAlertMsg').textContent   = msg;
+    document.getElementById('dlgAlert').classList.add('show');
+}
+function closeDlgAlert() {
+    document.getElementById('dlgAlert').classList.remove('show');
+}
+function showDlgConfirm(callback) {
+    _confirmCallback = callback;
+    document.getElementById('dlgConfirm').classList.add('show');
+}
+function closeDlgConfirm(result) {
+    document.getElementById('dlgConfirm').classList.remove('show');
+    if (_confirmCallback) { _confirmCallback(result); _confirmCallback = null; }
+}
+
 var CTX = '${pageContext.request.contextPath}';
 
 // 상품 목록 JS 배열 (동적 행 추가용)
@@ -299,7 +378,7 @@ function addRow() {
 
 function delRow(btn) {
     if (document.querySelectorAll('#itemBody tr').length <= 1) {
-        alert('최소 1개 상품이 필요합니다.'); return;
+        showDlgAlert('최소 1개 상품이 필요합니다.', '⚠️', '삭제 불가'); return;
     }
     btn.closest('tr').remove();
     updateRowNums();
@@ -343,22 +422,21 @@ function submitForm() {
     var approverId = document.getElementById('approverId').value;
     var title      = document.getElementById('docTitle').value.trim();
 
-    if (!docType)    { alert('문서 유형을 선택하세요.'); return; }
-    if (!approverId) { alert('결재자를 선택하세요.');   return; }
-    if (!title)      { alert('제목을 입력하세요.');      return; }
+    if (!docType)    { showDlgAlert('문서 유형을 선택하세요.', '📝', '입력 확인'); return; }
+    if (!approverId) { showDlgAlert('결재자를 선택하세요.', '👤', '입력 확인'); return; }
+    if (!title)      { showDlgAlert('제목을 입력하세요.', '📝', '입력 확인'); return; }
 
     var selects = document.querySelectorAll('select[name="productId"]');
     var hasProduct = Array.from(selects).some(function(s) { return s.value !== ''; });
-    if (!hasProduct) { alert('상품을 1개 이상 선택하세요.'); return; }
+    if (!hasProduct) { showDlgAlert('상품을 1개 이상 선택하세요.', '📦', '입력 확인'); return; }
 
-    if (!confirm('기안을 올리시겠습니까?')) return;
-
-    var form = document.getElementById('approvalForm');
-    var data = new URLSearchParams(new FormData(form));
-
-    var btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = '처리중...';
+    showDlgConfirm(function(ok) {
+        if (!ok) return;
+        var form = document.getElementById('approvalForm');
+        var data = new URLSearchParams(new FormData(form));
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = '처리중...';
 
     fetch(CTX + '/approval/insert.do', {
         method: 'POST',
@@ -367,7 +445,7 @@ function submitForm() {
     .then(function(res) { return res.text(); })
     .then(function(result) {
         if (result === 'OK') {
-            alert('기안이 정상적으로 올라갔습니다.');
+            showDlgAlert('기안이 정상적으로 올라갔습니다.', '✅', '기안 완료');
             // PC 모달: 부모창 함수 호출
             if (window.parent && window.parent !== window && typeof window.parent.onFormComplete === 'function') {
                 window.parent.onFormComplete();
@@ -376,16 +454,17 @@ function submitForm() {
                 location.href = CTX + '/approval/pending.do';
             }
         } else {
-            alert('등록 중 오류가 발생했습니다.');
+            showDlgAlert('등록 중 오류가 발생했습니다.\n다시 시도해주세요.', '❌', '오류');
             btn.disabled = false;
             btn.textContent = '기안 올리기';
         }
     })
     .catch(function() {
-        alert('네트워크 오류가 발생했습니다.');
+        showDlgAlert('네트워크 오류가 발생했습니다.', '🌐', '연결 오류');
         btn.disabled = false;
         btn.textContent = '기안 올리기';
     });
+    }); // showDlgConfirm 콜백 닫기
 }
 </script>
 </body>

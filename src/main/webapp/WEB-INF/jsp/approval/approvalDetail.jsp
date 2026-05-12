@@ -380,6 +380,31 @@
 </div>
 
 <script>
+
+function closeDlgAlertDetail() {
+    var d = document.getElementById('_alertDlg');
+    if (d) d.remove();
+}
+
+/* ── 알림 다이얼로그 (alert 대체) ── */
+function showDlgAlert(msg, icon, title) {
+    // approvalDetail에는 별도 alert overlay가 없으므로 간단 overlay 동적 생성
+    var existing = document.getElementById('_alertDlg');
+    if (existing) existing.remove();
+    var d = document.createElement('div');
+    d.id = '_alertDlg';
+    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;padding:20px;';
+    d.innerHTML =
+        '<div style="background:white;border-radius:8px;padding:24px 20px 16px;width:100%;max-width:280px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2)">' +
+        '<div style="font-size:28px;margin-bottom:10px">' + (icon||'⚠️') + '</div>' +
+        '<div style="font-size:14px;font-weight:700;color:#222;margin-bottom:6px">' + (title||'알림') + '</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:16px;line-height:1.6">' + msg + '</div>' +
+        '<button onclick="closeDlgAlertDetail()" ' +
+        'style="width:100%;height:36px;background:#0066CC;color:white;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer">확인</button>' +
+        '</div>';
+    document.body.appendChild(d);
+}
+
 var CTX    = '${pageContext.request.contextPath}';
 var DOC_ID = '${doc.docId}';
 
@@ -434,7 +459,7 @@ function doApprove() {
         if (result === 'OK') {
             afterAction();
         } else {
-            alert('처리 중 오류가 발생했습니다.');
+            showDlgAlert('처리 중 오류가 발생했습니다.', '❌', '오류');
         }
     });
 }
@@ -452,7 +477,7 @@ function doStartReview() {
         if (result === 'OK') {
             afterAction();
         } else {
-            alert('처리 중 오류가 발생했습니다.');
+            showDlgAlert('처리 중 오류가 발생했습니다.', '❌', '오류');
         }
     });
 }
@@ -474,9 +499,14 @@ function doReject() {
     .then(function(result) {
         closeDialog('rejectDialog');
         if (result === 'OK') {
-            afterAction();
+            showDlgAlert('반려 처리되었습니다.', '❌', '처리 완료');
+            setTimeout(function() {
+                var d = document.getElementById('_alertDlg');
+                if (d) d.remove();
+                afterAction();
+            }, 700);
         } else {
-            alert('처리 중 오류가 발생했습니다.');
+            showDlgAlert('처리 중 오류가 발생했습니다.', '❌', '오류');
         }
     });
 }
