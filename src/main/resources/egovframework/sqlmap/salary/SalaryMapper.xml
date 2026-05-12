@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.salary.mapper.SalaryMapper">
+
+    <resultMap id="salaryResultMap" type="egovframework.salary.vo.SalaryVO">
+        <id     property="salaryId"    column="salary_id"/>
+        <result property="memberId"    column="member_id"/>
+        <result property="name"        column="name"/>
+        <result property="department"  column="department"/>
+        <result property="position"    column="position"/>
+        <result property="baseSalary"  column="base_salary"/>
+        <result property="payYear"     column="pay_year"/>
+        <result property="payMonth"    column="pay_month"/>
+        <result property="createdAt"   column="created_at"/>
+    </resultMap>
+
+    <!-- 전체 급여 목록 (직급별 기본급 JOIN) -->
+    <select id="selectSalaryList" resultMap="salaryResultMap">
+        SELECT s.salary_id, s.member_id, m.name, m.department, m.position,
+               COALESCE(sg.base_salary, 0) AS base_salary,
+               s.pay_year, s.pay_month, s.created_at
+        FROM   salary s
+        JOIN   member m ON s.member_id = m.member_id
+        LEFT JOIN salary_grade sg ON m.position = sg.position
+        ORDER BY s.pay_year DESC, s.pay_month DESC, m.name
+    </select>
+
+    <!-- 개인 급여 조회 -->
+    <select id="selectSalaryByMemberId" parameterType="String" resultMap="salaryResultMap">
+        SELECT s.salary_id, s.member_id, m.name, m.department, m.position,
+               COALESCE(sg.base_salary, 0) AS base_salary,
+               s.pay_year, s.pay_month, s.created_at
+        FROM   salary s
+        JOIN   member m ON s.member_id = m.member_id
+        LEFT JOIN salary_grade sg ON m.position = sg.position
+        WHERE  s.member_id = #{memberId}
+        ORDER BY s.pay_year DESC, s.pay_month DESC
+    </select>
+
+    <!-- 급여 등록 -->
+    <insert id="insertSalary" parameterType="egovframework.salary.vo.SalaryVO">
+        INSERT INTO salary (member_id, base_salary, pay_year, pay_month)
+        VALUES (#{memberId},
+                (SELECT base_salary FROM salary_grade WHERE position =
+                    (SELECT position FROM member WHERE member_id = #{memberId})),
+                #{payYear}, #{payMonth})
+    </insert>
+
+    <!-- 급여 수정 -->
+    <update id="updateSalary" parameterType="egovframework.salary.vo.SalaryVO">
+        UPDATE salary
+        SET base_salary = #{baseSalary}
+        WHERE salary_id = #{salaryId}
+    </update>
+
+</mapper>
