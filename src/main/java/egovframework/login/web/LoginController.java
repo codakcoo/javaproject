@@ -14,17 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import egovframework.dept.service.DeptService;
-
-
-
-@Controller
-public class LoginController {
-	@Autowired
-	private DeptService deptService;
-    @Autowired
-    private MemberService memberService;
 import java.util.List;
 import java.util.Map;
+
 
 @Controller
 public class LoginController {
@@ -33,6 +25,7 @@ public class LoginController {
     @Autowired private MemberMapper    memberMapper;
     @Autowired private ProductMapper    productMapper;
     @Autowired private ApprovalService  approvalService;
+    @Autowired private DeptService deptService;
 
     /** 로그인 화면 */
     @GetMapping("/login.do")
