@@ -201,6 +201,14 @@ table {
         <th style="width:130px;">연락처</th>
         <th style="width:60px;">상태</th>
         <th style="width:120px;">관리</th>
+        <th>사번</th>
+        <th>이름</th>
+        <th>부서</th>
+        <th>직급</th>
+        <th>이메일</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>관리</th>
     </tr>
 </thead>
            <tbody>

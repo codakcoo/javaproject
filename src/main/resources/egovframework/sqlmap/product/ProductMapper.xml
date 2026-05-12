@@ -97,9 +97,9 @@
         WHERE product_id = #{productId}
     </update>
 
-    <delete id="deleteProduct" parameterType="Long">
-        DELETE FROM PRODUCT WHERE product_id = #{productId}
-    </delete>
+    <update id="deleteProduct" parameterType="long">
+    	UPDATE product SET is_active = 0 WHERE product_id = #{productId}
+	</update>
 
     <!-- 상품 삭제 시 INVENTORY 먼저 제거 (FK 제약 방지) -->
     <delete id="deleteInventoryByProductId" parameterType="Long">
@@ -253,6 +253,41 @@
         </where>
     </select>
 
+
+
+    <!-- MAIN 창고 ID 조회 (재고 반영 시 사용) -->
+    <select id="selectMainWarehouseId" resultType="long">
+        SELECT warehouse_id FROM warehouse WHERE type = 'MAIN' AND is_active = 1 LIMIT 1
+    </select>
+
+    <!-- 특정 상품의 MAIN 창고 inventory 존재 여부 -->
+    <select id="selectInventoryByProductAndWarehouse" resultType="long"
+            parameterType="egovframework.product.vo.ProductVO">
+        SELECT IFNULL(SUM(qty_on_hand), -1)
+        FROM   inventory
+        WHERE  product_id   = #{productId}
+          AND  warehouse_id = #{warehouseId}
+    </select>
+
+    <!-- 재고 수량 변동 (승인 시 자동 호출: 입고+, 출고-) -->
+    <update id="updateInventoryQty" parameterType="egovframework.product.vo.ProductVO">
+        UPDATE inventory
+        SET    qty_on_hand   = qty_on_hand + #{qtyDelta},
+               last_updated  = NOW()
+        WHERE  product_id   = #{productId}
+          AND  warehouse_id = #{warehouseId}
+    </update>
+
+    <!-- 재고 이동 이력 INSERT -->
+    <insert id="insertStockMovement" parameterType="egovframework.product.vo.ProductVO">
+        INSERT INTO stock_movement
+            (product_id, warehouse_id, movement_type, qty,
+             unit_cost, ref_order_id, ref_order_type, remarks, created_by, created_at)
+        VALUES
+            (#{productId}, #{warehouseId}, #{movementType}, #{qtyDelta},
+             #{unitCost}, #{refOrderId}, #{refOrderType}, #{remarks}, #{createdBy}, NOW())
+    </insert>
+
     <update id="updateStock" parameterType="egovframework.product.vo.ProductVO">
         UPDATE INVENTORY
         SET qty_on_hand = #{qtyOnHand}
@@ -276,6 +311,23 @@
       	AND  p.is_active = 1
       	AND  w.type != 'DEFECT'
 	</select>
+
+    <!-- 재고 부족 상품 목록 (대시보드용, 최대 5건) -->
+    <select id="selectLowStockList" resultMap="productResultMap">
+        SELECT p.product_id, p.product_code, p.product_name, p.unit,
+               p.reorder_point,
+               IFNULL(SUM(i.qty_on_hand), 0) AS qty_on_hand,
+               ROUND(IFNULL(SUM(i.qty_on_hand), 0) / NULLIF(p.reorder_point, 0) * 100) AS stock_pct
+        FROM   product p
+        JOIN   inventory i ON p.product_id  = i.product_id
+        JOIN   warehouse w ON i.warehouse_id = w.warehouse_id
+        WHERE  p.is_active = 1
+        AND    w.type != 'DEFECT'
+        GROUP BY p.product_id, p.product_code, p.product_name, p.unit, p.reorder_point
+        HAVING IFNULL(SUM(i.qty_on_hand), 0) &lt;= p.reorder_point
+        ORDER BY (IFNULL(SUM(i.qty_on_hand), 0) / NULLIF(p.reorder_point, 0)) ASC
+        LIMIT 5
+    </select>
 
     <!-- ============================================================ -->
     <!--  자동 채번                                                       -->
