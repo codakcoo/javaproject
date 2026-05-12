@@ -8,14 +8,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-
+import egovframework.dept.service.DeptService;
+import egovframework.dept.vo.DeptVO;
 @Controller
 @RequestMapping("/hr")
 public class HrController {
 
     @Autowired
     private MemberService memberService;
-
+    @Autowired
+    private DeptService deptService;
     /** 직원 목록 (DB 연동) */
     @GetMapping("/list.do")
     public String empList(
@@ -47,9 +49,9 @@ public class HrController {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         MemberVO member = memberService.getMemberById(memberId);
         model.addAttribute("member", member);
+        model.addAttribute("deptList", deptService.getDeptList());
         return "hr/empUpdateForm";
     }
-
     /** 직원 수정 처리 */
     @PostMapping("/update.do")
     public String update(@ModelAttribute MemberVO member, HttpSession session) {

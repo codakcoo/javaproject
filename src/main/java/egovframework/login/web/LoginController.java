@@ -7,10 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
+import egovframework.dept.service.DeptService;
+
+
 
 @Controller
 public class LoginController {
-
+	@Autowired
+	private DeptService deptService;
     @Autowired
     private MemberService memberService;
 
@@ -44,7 +48,9 @@ public class LoginController {
 
     /** 회원가입 폼 */
     @GetMapping("/register.do")
-    public String registerForm() {
+  
+    public String registerForm(Model model) {
+        model.addAttribute("deptList", deptService.getDeptList());
         return "login/register";
     }
 

@@ -104,12 +104,12 @@
     <label>부서</label>
     <c:choose>
         <c:when test="${loginUser.role == 'ADMIN' or loginUser.department == '인사팀'}">
-            <select name="department">
-                <option value="">선택하세요</option>
-                <option value="개발팀" ${member.department == '개발팀' ? 'selected' : ''}>개발팀</option>
-                <option value="인사팀" ${member.department == '인사팀' ? 'selected' : ''}>인사팀</option>
-                <option value="영업팀" ${member.department == '영업팀' ? 'selected' : ''}>영업팀</option>
-            </select>
+         <select name="department">
+    <option value="">선택하세요</option>
+    <c:forEach var="dept" items="${deptList}">
+        <option value="${dept.deptName}" ${member.department == dept.deptName ? 'selected' : ''}>${dept.deptName}</option>
+    </c:forEach>
+</select>
         </c:when>
         <c:otherwise>
             <input type="text" value="${member.department}" readonly>

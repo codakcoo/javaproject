@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.dept.mapper.DeptMapper">
+
+    <resultMap id="deptResultMap" type="egovframework.dept.vo.DeptVO">
+        <id     property="deptId"      column="dept_id"/>
+        <result property="deptName"    column="dept_name"/>
+        <result property="managerId"   column="manager_id"/>
+        <result property="managerName" column="manager_name"/>
+        <result property="empCount"    column="emp_count"/>
+        <result property="createdAt"   column="created_at"/>
+    </resultMap>
+
+    <!-- 부서 목록 조회 (소속 직원 수 포함) -->
+    <select id="selectDeptList" resultMap="deptResultMap">
+        SELECT d.dept_id, d.dept_name, d.manager_id,
+               m.name AS manager_name,
+               COUNT(e.member_id) AS emp_count,
+               d.created_at
+        FROM   department d
+        LEFT JOIN member m ON d.manager_id = m.member_id
+        LEFT JOIN member e ON e.dept_id = d.dept_id AND e.status = 'ACTIVE'
+        GROUP BY d.dept_id, d.dept_name, d.manager_id, m.name, d.created_at
+        ORDER BY d.dept_id
+    </select>
+
+    <!-- 부서 단건 조회 -->
+    <select id="selectDeptById" parameterType="String" resultMap="deptResultMap">
+        SELECT dept_id, dept_name, manager_id, created_at
+        FROM   department
+        WHERE  dept_id = #{deptId}
+    </select>
+
+    <!-- 부서 추가 -->
+    <insert id="insertDept" parameterType="egovframework.dept.vo.DeptVO">
+        INSERT INTO department (dept_id, dept_name, manager_id)
+        VALUES (#{deptId}, #{deptName}, #{managerId, jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 부서 수정 -->
+    <update id="updateDept" parameterType="egovframework.dept.vo.DeptVO">
+        UPDATE department
+        SET dept_name  = #{deptName},
+            manager_id = #{managerId, jdbcType=VARCHAR}
+        WHERE dept_id = #{deptId}
+    </update>
+
+    <!-- 부서 삭제 -->
+    <delete id="deleteDept" parameterType="String">
+        DELETE FROM department
+        WHERE dept_id = #{deptId}
+    </delete>
+
+</mapper>

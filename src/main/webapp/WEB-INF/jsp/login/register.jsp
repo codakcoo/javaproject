@@ -128,12 +128,12 @@
         </div>
     	<div class="field">
     		<label>부서</label>
-    	 <select name="department" required>
-        <option value="">부서를 선택하세요</option>
-        <option value="개발팀">개발팀</option>
-        <option value="인사팀">인사팀</option>
-        <option value="영업팀">영업팀</option>
-    </select>
+   <select name="department" required>
+    <option value="">부서를 선택하세요</option>
+    <c:forEach var="dept" items="${deptList}">
+        <option value="${dept.deptName}">${dept.deptName}</option>
+    </c:forEach>
+</select>
 		</div>
         <!-- 약관동의 -->
         <div class="field">

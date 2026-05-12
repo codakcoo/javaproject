@@ -49,23 +49,34 @@
     .ml-auto { margin-left: auto; }
 
     /* 테이블 카드 */
-    .table-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+.table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+table {
+    min-width: 700px;
+    width: 100%;
+    border-collapse: collapse;
+    talbe-layout: fixed;
+}
 
     /* ── 모바일 반응형 ── */
-    @media (max-width: 768px) {
-        .table-card { border-radius: 6px; }
-        table { min-width: 620px; }
-        thead th { font-size: 11px; padding: 8px 10px; }
-        tbody td  { font-size: 11px; padding: 8px 10px; }
-        .table-card-head { padding: 10px 12px; }
-    }
+@media (max-width: 768px) {
+    .table-card { border-radius: 6px; }
+    .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 700px; table-layout: fixed; }
+    thead th { font-size: 11px; padding: 8px 10px; white-space: nowrap; }
+    tbody td  { font-size: 11px; padding: 8px 10px; white-space: nowrap; }
+    .table-card-head { padding: 10px 12px; }
+}
 
     .table-card-head {
         display: flex; align-items: center; justify-content: space-between;
@@ -177,17 +188,19 @@
             <span>직원 목록</span>
             <span class="total-badge">총 <strong>${empty empList ? '0' : empList.size()}</strong>명</span>
         </div>
+        <div class="table-wrap">
         <table>
          <thead>
     <tr>
-        <th>사번</th>
-        <th>이름</th>
-        <th>부서</th>
-        <th>직급</th>
-        <th>이메일</th>
-        <th>연락처</th>
-        <th>상태</th>
-        <th>관리</th>
+ 
+        <th style="width:100px;">사번</th>
+        <th style="width:80px;">이름</th>
+        <th style="width:80px;">부서</th>
+        <th style="width:60px;">직급</th>
+        <th style="width:160px;">이메일</th>
+        <th style="width:130px;">연락처</th>
+        <th style="width:60px;">상태</th>
+        <th style="width:120px;">관리</th>
     </tr>
 </thead>
            <tbody>
