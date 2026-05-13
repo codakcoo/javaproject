@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
+
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.HashMap;
+import java.util.Map;
 @Controller
 @RequestMapping("/dept")
 public class DeptController {
@@ -49,4 +53,19 @@ public class DeptController {
         deptService.deleteDept(deptId);
         return "redirect:/dept/list.do";
     }
+    @GetMapping("/checkDuplicate.do")
+    @ResponseBody
+    public Map<String, Object> checkDuplicate(
+            @RequestParam(value="deptId", required=false, defaultValue="") String deptId,
+            @RequestParam(value="deptName", required=false, defaultValue="") String deptName,
+            @RequestParam(value="excludeId", required=false, defaultValue="") String excludeId) {
+        Map<String, Object> result = new HashMap<>();
+        String duplicateField = deptService.checkDuplicate(deptId, deptName, excludeId);
+        result.put("duplicate", duplicateField != null);
+        result.put("field", duplicateField);
+        return result;
+    }
+    
+    
+    
 }

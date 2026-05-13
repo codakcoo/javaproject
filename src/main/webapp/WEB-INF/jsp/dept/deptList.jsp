@@ -37,7 +37,25 @@
     .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
     .modal-btn-cancel { padding: 8px 20px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; background: #F1F5F9; color: #64748B; border: none; }
     .modal-btn-save { padding: 8px 20px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; background: #2563EB; color: white; border: none; font-weight: 600; }
+	/* 중복 경고 모달 */
+	.alert-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1100; align-items:center; justify-content:center; }
+	.alert-modal-bg.active { display:flex; }
+	.alert-modal { background:white; border-radius:16px; padding:32px; width:360px; max-width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.18); text-align:center; }
+	.alert-modal .alert-icon { font-size:36px; margin-bottom:12px; }
+	.alert-modal h4 { font-size:16px; font-weight:700; margin-bottom:8px; color:#1E293B; }
+	.alert-modal p { font-size:13px; color:#64748B; margin-bottom:20px; }
+	.alert-modal-btn { padding:9px 28px; background:#2563EB; color:white; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+
 </style>
+<!-- 중복 경고 모달 -->
+<div class="alert-modal-bg" id="dupModal">
+    <div class="alert-modal">
+        <div class="alert-icon">⚠️</div>
+        <h4>중복된 부서 정보</h4>
+        <p id="dupModalMsg">이미 존재하는 부서코드 또는 부서명입니다.</p>
+        <button class="alert-modal-btn" onclick="closeDupModal()">확인</button>
+    </div>
+</div>
 
 <!-- 수정 모달 -->
 <div class="modal-bg" id="editModal">
@@ -136,8 +154,9 @@
     </div>
     </c:if>
 </main>
-
 <script>
+var ctxPath = '${pageContext.request.contextPath}';
+
 function openEditModal(deptId, deptName) {
     document.getElementById('editDeptId').value = deptId;
     document.getElementById('editDeptIdShow').value = deptId;
@@ -150,8 +169,46 @@ function closeEditModal() {
 document.getElementById('editModal').addEventListener('click', function(e) {
     if (e.target === this) closeEditModal();
 });
-</script>
 
-</div>
+function closeDupModal() {
+    document.getElementById('dupModal').classList.remove('active');
+}
+
+function checkAndSubmit(deptId, deptName, excludeId, onSuccess) {
+    fetch(ctxPath + '/dept/checkDuplicate.do?deptId=' + encodeURIComponent(deptId || '')
+        + '&deptName=' + encodeURIComponent(deptName || '')
+        + '&excludeId=' + encodeURIComponent(excludeId || ''))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.duplicate) {
+                document.getElementById('dupModalMsg').textContent
+                    = '"' + (data.field === '부서코드' ? deptId : deptName) + '" 은(는) 이미 존재하는 ' + data.field + '입니다.';
+                document.getElementById('dupModal').classList.add('active');
+            } else {
+                onSuccess();
+            }
+        })
+        .catch(function() { onSuccess(); });
+}
+
+var addForm = document.querySelector('.add-card form');
+if (addForm) {
+    addForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        var deptId   = form.querySelector('[name=deptId]').value.trim();
+        var deptName = form.querySelector('[name=deptName]').value.trim();
+        checkAndSubmit(deptId, deptName, '', function() { form.submit(); });
+    });
+}
+
+document.querySelector('.modal-btn-save').addEventListener('click', function() {
+    var deptId   = document.getElementById('editDeptId').value.trim();
+    var deptName = document.getElementById('editDeptName').value.trim();
+    checkAndSubmit('', deptName, deptId, function() {
+        document.getElementById('editForm').submit();
+    });
+});
+</script>
 </body>
 </html>
