@@ -54,8 +54,6 @@ public class HrController {
         model.addAttribute("deptList", deptService.getDeptList());
         return "hr/empUpdateForm";
     }
-        return "hr/empUpdateForm";
-    }
 
     /** 직원 수정 처리 */
     @PostMapping("/update.do")
