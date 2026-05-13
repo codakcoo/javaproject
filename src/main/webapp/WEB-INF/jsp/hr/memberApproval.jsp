@@ -182,7 +182,7 @@
                                             onclick="openApproveModal('${member.memberId}', '${member.name}')">승인</button>
                                         <button class="btn-reject"
                                             onclick="openRejectModal('${member.memberId}', '${member.name}')">거절</button>
-                                        <form action="${pageContext.request.contextPath}/hr/approve.do" method="post" style="display:inline">
+                                        <%-- <form action="${pageContext.request.contextPath}/hr/approve.do" method="post" style="display:inline">
                                             <input type="hidden" name="memberId" value="${member.memberId}">
                                             <button type="submit" class="btn-approve"
                                                 onclick="return confirm('${member.name}님을 승인하시겠습니까?')">승인</button>

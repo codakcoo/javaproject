@@ -8,15 +8,17 @@
         <property name="dataSource" ref="dataSource" />
         <property name="mapperLocations" value="classpath:/egovframework/sqlmap/**/*.xml" />
     </bean>
-    <bean class="org.egovframe.rte.psl.dataaccess.mapper.MapperConfigurer">
-<property name="basePackage"
+<bean class="org.egovframe.rte.psl.dataaccess.mapper.MapperConfigurer">
+    <property name="basePackage"
         value="egovframework.member.mapper,
                egovframework.product.mapper,
                egovframework.approval.mapper,
                egovframework.order.mapper,
                egovframework.salary.mapper,
-               egovframework.dept.mapper" />
-                   </bean>
+               egovframework.dept.mapper,
+               egovframework.supplier.mapper,
+               egovframework.customer.mapper" />
+</bean>
                    
 
 </beans>
