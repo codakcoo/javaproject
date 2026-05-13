@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.customer.mapper.CustomerMapper">
+
+    <resultMap id="customerResultMap" type="egovframework.customer.vo.CustomerVO">
+        <id     property="customerId"   column="customer_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="contact"      column="contact"/>
+        <result property="phone"        column="phone"/>
+        <result property="address"      column="address"/>
+        <result property="isActive"     column="is_active"/>
+    </resultMap>
+
+    <select id="selectCustomerList" resultMap="customerResultMap">
+        SELECT customer_id, customer_name, contact, phone, address, is_active
+        FROM   customer
+        WHERE  is_active = 1
+        ORDER BY customer_name
+    </select>
+
+</mapper>

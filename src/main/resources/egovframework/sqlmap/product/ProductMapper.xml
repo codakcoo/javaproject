@@ -269,14 +269,23 @@
           AND  warehouse_id = #{warehouseId}
     </select>
 
-    <!-- 재고 수량 변동 (승인 시 자동 호출: 입고+, 출고-) -->
-    <update id="updateInventoryQty" parameterType="egovframework.product.vo.ProductVO">
-        UPDATE inventory
-        SET    qty_on_hand   = qty_on_hand + #{qtyDelta},
-               last_updated  = NOW()
-        WHERE  product_id   = #{productId}
-          AND  warehouse_id = #{warehouseId}
-    </update>
+    <!-- 재고 수량 변동 — UPSERT (레코드 없으면 INSERT, 있으면 UPDATE) -->
+    <insert id="updateInventoryQty" parameterType="egovframework.product.vo.ProductVO">
+        INSERT INTO inventory (product_id, warehouse_id, qty_on_hand, qty_reserved, last_updated)
+        VALUES (#{productId}, #{warehouseId}, #{qtyDelta}, 0, NOW())
+        ON DUPLICATE KEY UPDATE
+            qty_on_hand  = qty_on_hand + #{qtyDelta},
+            last_updated = NOW()
+    </insert>
+
+    <!-- 재고 조정 (STOCK_ADJ): 절대값으로 SET -->
+    <insert id="setInventoryQty" parameterType="egovframework.product.vo.ProductVO">
+        INSERT INTO inventory (product_id, warehouse_id, qty_on_hand, qty_reserved, last_updated)
+        VALUES (#{productId}, #{warehouseId}, #{qtyDelta}, 0, NOW())
+        ON DUPLICATE KEY UPDATE
+            qty_on_hand  = #{qtyDelta},
+            last_updated = NOW()
+    </insert>
 
     <!-- 재고 이동 이력 INSERT -->
     <insert id="insertStockMovement" parameterType="egovframework.product.vo.ProductVO">

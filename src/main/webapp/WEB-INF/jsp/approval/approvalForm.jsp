@@ -251,22 +251,18 @@
                     <label>공급업체 (입고처)</label>
                     <select name="supplierId">
                         <option value="">선택 안함</option>
-                        <option value="1">한국식품유통(주)</option>
-                        <option value="2">글로벌전자부품률</option>
-                        <option value="3">대한소모품률주</option>
-                        <option value="4">원자재공급센터</option>
-                        <option value="5">기타상품도매(주)</option>
+                        <c:forEach items="${supplierList}" var="s">
+                            <option value="${s.supplierId}">${s.supplierName}</option>
+                        </c:forEach>
                     </select>
                 </div>
                 <div class="form-group" id="customerGroup" style="display:none">
                     <label>고객사 (출고처)</label>
                     <select name="customerId">
                         <option value="">선택 안함</option>
-                        <option value="1">마트코퍼인몰</option>
-                        <option value="2">편의점하거봄</option>
-                        <option value="3">온라인소핑C</option>
-                        <option value="4">지역마트D</option>
-                        <option value="5">도매슈퍼E</option>
+                        <c:forEach items="${customerList}" var="c">
+                            <option value="${c.customerId}">${c.customerName}</option>
+                        </c:forEach>
                     </select>
                 </div>
             </div>
