@@ -191,7 +191,7 @@
                                             <input type="hidden" name="memberId" value="${member.memberId}">
                                             <button type="submit" class="btn-reject"
                                                 onclick="return confirm('${member.name}님을 거절하시겠습니까?')">거절</button>
-                                        </form>
+                                        </form> --%>
                                     </div>
                                 </td>
                             </tr>

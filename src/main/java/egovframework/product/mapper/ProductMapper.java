@@ -32,7 +32,8 @@ public interface ProductMapper {
     int             selectStockCountAll(ProductVO vo);
 
     void            updateStock(ProductVO vo);
-    void            updateInventoryQty(ProductVO vo);
+    void            updateInventoryQty(ProductVO vo); // 입출고: ± delta
+    void            setInventoryQty(ProductVO vo);    // 재고조정: = 절대값
     void            insertStockMovement(ProductVO vo);
     Long            selectMainWarehouseId();
     double          selectInventoryByProductAndWarehouse(ProductVO vo);

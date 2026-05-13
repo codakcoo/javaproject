@@ -3,7 +3,9 @@ package egovframework.approval.web;
 import egovframework.approval.service.ApprovalService;
 import egovframework.approval.vo.ApprovalDocVO;
 import egovframework.approval.vo.ApprovalDocItemVO;
+import egovframework.customer.mapper.CustomerMapper;
 import egovframework.member.mapper.MemberMapper;
+import egovframework.supplier.mapper.SupplierMapper;
 import egovframework.member.vo.MemberVO;
 import egovframework.product.mapper.ProductMapper;
 import egovframework.product.vo.ProductVO;
@@ -22,6 +24,8 @@ public class ApprovalController {
 
     @Autowired private ApprovalService approvalService;
     @Autowired private ProductMapper   productMapper;
+    @Autowired private SupplierMapper  supplierMapper;
+    @Autowired private CustomerMapper  customerMapper;
     @Autowired private MemberMapper    memberMapper;
 
     // ── 탭 카운트 공통 ─────────────────────────────
@@ -116,7 +120,11 @@ public class ApprovalController {
 
         // 회원 목록 (결재자 선택용)
         List<MemberVO> memberList = memberMapper.selectMemberList();
-        model.addAttribute("memberList", memberList);
+        model.addAttribute("memberList",   memberList);
+
+        // 입고용 공급업체 목록 / 출고용 고객사 목록
+        model.addAttribute("supplierList", supplierMapper.selectSupplierList());
+        model.addAttribute("customerList", customerMapper.selectCustomerList());
 
         return "approval/approvalForm";
     }

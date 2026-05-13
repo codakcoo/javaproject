@@ -82,13 +82,15 @@ public class ApprovalServiceImpl implements ApprovalService {
         // 1. 상태 APPROVED로 변경
         changeStatus(docId, "APPROVED", approverId, null);
 
-        // 2. 결재 문서 + 상품 라인 조회
+        // 2. 결재 문서 헤더 조회
         ApprovalDocVO doc = approvalMapper.selectApproval(docId);
         if (doc == null) return;
 
+        // ★ 핵심: 상품 라인(items) 명시적으로 로딩
+        doc.setItems(approvalMapper.selectApprovalItems(docId));
+
         // 3. 주문 영수증 자동 생성
         orderReceiptService.createFromApproval(doc);
-        long receiptId = 0; // 영수증 ID는 stock_movement ref용
 
         // 4. 재고 반영 (INBOUND: +, OUTBOUND: -, STOCK_ADJ: ±)
         applyInventory(doc, approverId);
@@ -118,17 +120,26 @@ public class ApprovalServiceImpl implements ApprovalService {
                 return;
         }
 
+        boolean isAdjust = "STOCK_ADJ".equals(doc.getDocType());
+
         for (ApprovalDocItemVO item : doc.getItems()) {
             if (item.getProductId() == null) continue;
 
-            double qtyDelta = item.getQty() != null ? item.getQty() * sign : 0;
+            double qty = item.getQty() != null ? item.getQty() : 0;
+            double qtyDelta = isAdjust ? qty : qty * sign;
 
-            // inventory qty_on_hand 업데이트
             ProductVO pvo = new ProductVO();
             pvo.setProductId(item.getProductId());
             pvo.setWarehouseId(mainWarehouseId);
             pvo.setQtyDelta(qtyDelta);
-            productMapper.updateInventoryQty(pvo);
+
+            if (isAdjust) {
+                // 재고 조정: qty_on_hand = 입력값 (절대값 SET)
+                productMapper.setInventoryQty(pvo);
+            } else {
+                // 입고(+) / 출고(-): qty_on_hand += delta
+                productMapper.updateInventoryQty(pvo);
+            }
 
             // stock_movement 이력 INSERT
             pvo.setMovementType(movementType);
