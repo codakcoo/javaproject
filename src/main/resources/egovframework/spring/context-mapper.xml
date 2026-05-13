@@ -13,8 +13,6 @@
         value="egovframework.member.mapper,
                egovframework.product.mapper,
                egovframework.approval.mapper,
-               egovframework.supplier.mapper,
-               egovframework.customer.mapper,
                egovframework.order.mapper,
                egovframework.salary.mapper,
                egovframework.dept.mapper" />

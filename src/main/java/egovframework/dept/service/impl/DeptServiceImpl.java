@@ -27,4 +27,11 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public void deleteDept(String deptId) { deptMapper.deleteDept(deptId); }
+
+    @Override
+    public String checkDuplicate(String deptId, String deptName, String excludeId) {
+        if (deptMapper.countByDeptId(deptId) > 0) return "부서코드";
+        if (deptMapper.countByDeptName(deptName, excludeId) > 0) return "부서명";
+        return null;
+    }
 }

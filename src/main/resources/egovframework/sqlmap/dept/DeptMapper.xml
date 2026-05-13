@@ -52,5 +52,26 @@
         DELETE FROM department
         WHERE dept_id = #{deptId}
     </delete>
+    
+    <!--  부서코드 중복 체크 -->
+    <select id="countDuplicate" resultType="int">
+    SELECT COUNT(*) FROM department
+    WHERE dept_name = #{deptName}
+    <if test="deptId != null and deptId != ''">
+        AND dept_id != #{deptId}
+    </if>
+</select>
+
+<select id="countByDeptId" resultType="int">
+    SELECT COUNT(*) FROM department WHERE dept_id = #{deptId}
+</select>
+
+<select id="countByDeptName" resultType="int">
+    SELECT COUNT(*) FROM department
+    WHERE dept_name = #{deptName}
+    <if test="excludeId != null and excludeId != ''">
+        AND dept_id != #{excludeId}
+    </if>
+</select>
 
 </mapper>
