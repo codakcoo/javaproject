@@ -127,41 +127,73 @@ sequenceDiagram
 
 <h3>진행상황</h3>
 <h5>로그인 화면</h5>
-<img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/518b20ac-a3de-4fdf-8279-5b3fae7a2d70" />
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/e87ff16f-a3ee-42ef-bd7a-3b4e99269fe6" />
 <h5>회원가입 화면</h5>
-<img width="1904" height="1071" alt="image" src="https://github.com/user-attachments/assets/7e765dd5-61d0-47ba-81d5-e02c08e6b2d5" />
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/9471d3e3-5352-457c-ac81-69903a084c51" />
 <h5>메인 화면</h5>
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9249677a-3a6a-4bc8-bcf5-4b59a2bdbc1b" />
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/687be9e7-af01-4889-a213-167a479925f5" />
 
 <br><br>
 <h5>인사/조직 관리</h5>
+
 ## 인사/조직 카테고리
 <img width="221" height="145" alt="image" src="https://github.com/user-attachments/assets/bcd15dba-0449-4f59-b542-54e2c37ac798" />
+
 ## 직원 목록
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d89f88a8-14a3-435c-bf4a-6eb22d503296" />
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/4f954ef6-abe8-49b1-a2cc-4d9921fc9b88" />
+
 ## 부서관리(미구현)
+
+## 가입 승인 관리
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/d4556db2-0d1f-480a-a704-f07fc2ba3941" />
+
 
 <br><br>
 <h5>영업/재고 관리</h5>
+
 ## 영업/재고 카테고리
 <img width="221" height="186" alt="image" src="https://github.com/user-attachments/assets/7c2217d4-b70e-416a-8a9c-683e26d45812" />
+
 ## 상품 관리
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5ab35e8c-4d19-450b-9090-d4657d290cf0" />
+
 ## 판매 현황
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6f47ec7f-8e4a-4f13-9cae-31333dabf771" />
-## 재고 현황(해결)
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b04841d1-e271-48ae-8bcc-9968ff412bcd" />
+
+## 재고 현황
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/4a62dc77-a1fe-47ea-9678-1c81711f8446" />
+
 
 <br><br>
 <h5>결재관리</h5>
 <img width="174" height="177" alt="image" src="https://github.com/user-attachments/assets/3bc3810a-0bf3-4ac9-ac22-374fe8106706" />
-## 미구현
+
+## 총결재
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/bf601e6c-b06c-4540-b66b-803f41bd40ab" />
+
+## 기안중
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/51a43e31-0dbf-4585-adef-05dda9222933" />
+
+## 진행중
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/5b2b3210-220a-4c43-b15a-71560fc94180" />
+
+## 반려
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/1b9ba518-c0de-4c53-889b-d968cd5c93e1" />
+
+## 결재
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/6a977c03-947d-48c2-a02b-94e653313497" />
+
+
 
 <br><br>
 <h5>주문관리</h5>
+
 ## 주문 카테고리
 <img width="221" height="109" alt="image" src="https://github.com/user-attachments/assets/a6502fff-a7d4-4091-9386-4eafc7bc9bfc" />
-## 영수증(미구현)
+
+## 영수증
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/9934e41f-252f-4be3-a103-55ae6294df55" />
+
 
 ---
 <h3>DB 설정</h3>

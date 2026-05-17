@@ -1,0 +1,1 @@
+package egovframework.salary.vo;

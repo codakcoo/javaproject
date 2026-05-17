@@ -4,6 +4,9 @@ import egovframework.approval.mapper.ApprovalMapper;
 import egovframework.approval.service.ApprovalService;
 import egovframework.approval.vo.ApprovalDocVO;
 import egovframework.approval.vo.ApprovalDocItemVO;
+import egovframework.order.service.OrderReceiptService;
+import egovframework.product.mapper.ProductMapper;
+import egovframework.product.vo.ProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +19,9 @@ import java.util.Map;
 @Service
 public class ApprovalServiceImpl implements ApprovalService {
 
-    @Autowired
-    private ApprovalMapper approvalMapper;
+    @Autowired private ApprovalMapper      approvalMapper;
+    @Autowired private OrderReceiptService orderReceiptService;
+    @Autowired private ProductMapper       productMapper;  // ← 주문 생성 서비스
 
     @Override
     public List<ApprovalDocVO> getApprovalList(ApprovalDocVO vo) {
@@ -53,9 +57,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     public void addApproval(ApprovalDocVO vo) {
         String docNo = "AP-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
         vo.setDocNo(docNo);
-
         approvalMapper.insertApprovalDoc(vo);
-
         if (vo.getItems() != null) {
             for (ApprovalDocItemVO item : vo.getItems()) {
                 item.setDocId(vo.getDocId());
@@ -75,8 +77,78 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
+    @Transactional
     public void approveApproval(Long docId, String approverId) {
+        // 1. 상태 APPROVED로 변경
         changeStatus(docId, "APPROVED", approverId, null);
+
+        // 2. 결재 문서 헤더 조회
+        ApprovalDocVO doc = approvalMapper.selectApproval(docId);
+        if (doc == null) return;
+
+        // ★ 핵심: 상품 라인(items) 명시적으로 로딩
+        doc.setItems(approvalMapper.selectApprovalItems(docId));
+
+        // 3. 주문 영수증 자동 생성
+        orderReceiptService.createFromApproval(doc);
+
+        // 4. 재고 반영 (INBOUND: +, OUTBOUND: -, STOCK_ADJ: ±)
+        applyInventory(doc, approverId);
+    }
+
+    /**
+     * 결재 승인 시 inventory.qty_on_hand 반영 + stock_movement 이력 생성
+     */
+    private void applyInventory(ApprovalDocVO doc, String approverId) {
+        if (doc.getItems() == null || doc.getItems().isEmpty()) return;
+
+        // MAIN 창고 ID 조회
+        Long mainWarehouseId = productMapper.selectMainWarehouseId();
+        if (mainWarehouseId == null) return;
+
+        // doc_type 기반 movement_type 결정
+        String movementType;
+        double sign;  // 입고: +1, 출고: -1
+        switch (doc.getDocType() != null ? doc.getDocType() : "") {
+            case "INBOUND":
+                movementType = "INBOUND";  sign = 1;   break;
+            case "OUTBOUND":
+                movementType = "OUTBOUND"; sign = -1;  break;
+            case "STOCK_ADJ":
+                movementType = "ADJUST";   sign = 1;   break;
+            default:
+                return;
+        }
+
+        boolean isAdjust = "STOCK_ADJ".equals(doc.getDocType());
+
+        for (ApprovalDocItemVO item : doc.getItems()) {
+            if (item.getProductId() == null) continue;
+
+            double qty = item.getQty() != null ? item.getQty() : 0;
+            double qtyDelta = isAdjust ? qty : qty * sign;
+
+            ProductVO pvo = new ProductVO();
+            pvo.setProductId(item.getProductId());
+            pvo.setWarehouseId(mainWarehouseId);
+            pvo.setQtyDelta(qtyDelta);
+
+            if (isAdjust) {
+                // 재고 조정: qty_on_hand = 입력값 (절대값 SET)
+                productMapper.setInventoryQty(pvo);
+            } else {
+                // 입고(+) / 출고(-): qty_on_hand += delta
+                productMapper.updateInventoryQty(pvo);
+            }
+
+            // stock_movement 이력 INSERT
+            pvo.setMovementType(movementType);
+            pvo.setUnitCost(item.getUnitCost() != null ? item.getUnitCost() : 0);
+            pvo.setRefOrderType(doc.getDocType());
+            pvo.setRemarks(doc.getTitle());
+            pvo.setCreatedBy(approverId);
+            productMapper.insertStockMovement(pvo);
+        }
     }
 
     @Override

@@ -15,7 +15,7 @@ public interface ProductMapper {
     int             selectProductCount(ProductVO vo);
     void            insertProduct(ProductVO vo);
     void            updateProduct(ProductVO vo);
-    void            deleteProduct(Long productId);
+    void 			deleteProduct(Long productId); 
     void            deleteInventoryByProductId(Long productId);
 
     // 판매 현황 (SALES_ORDER)
@@ -32,10 +32,16 @@ public interface ProductMapper {
     int             selectStockCountAll(ProductVO vo);
 
     void            updateStock(ProductVO vo);
+    void            updateInventoryQty(ProductVO vo); // 입출고: ± delta
+    void            setInventoryQty(ProductVO vo);    // 재고조정: = 절대값
+    void            insertStockMovement(ProductVO vo);
+    Long            selectMainWarehouseId();
+    double          selectInventoryByProductAndWarehouse(ProductVO vo);
 
     // 대시보드
     int             selectTotalProductCount();
     int             selectLowStockCount();
+    List<ProductVO> selectLowStockList();   // 대시보드 재고부족 알림용
 
     // 자동 채번: 카테고리별 마지막 상품코드 조회
     String          selectLastProductCodeByCategory(String category);

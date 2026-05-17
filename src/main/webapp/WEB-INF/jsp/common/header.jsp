@@ -17,20 +17,21 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --blue:      #0066CC;
-            --blue-h:    #0055AA;
-            --blue-lt:   #E8F0FB;
-            --bg:        #F2F3F5;
-            --surface:   #FFFFFF;
-            --border:    #DDDDDD;
-            --border-lt: #EEEEEE;
-            --text:      #222222;
-            --text-sm:   #555555;
-            --muted:     #999999;
-            --sidebar-w: 180px;
-            --header-h:  44px;
-        }
+      :root {
+    --blue:      #0066CC;
+    --blue-h:    #0055AA;
+    --blue-lt:   #E8F0FB;
+    --bg:        #F2F3F5;
+    --surface:   #FFFFFF;
+    --border:    #DDDDDD;
+    --border-lt: #EEEEEE;
+    --text:      #222222;
+    --text-sm:   #555555;
+    --muted:     #999999;
+    --accent:    #2563EB;   /* ← 이거 추가 */
+    --sidebar-w: 180px;
+    --header-h:  44px;
+}
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕",

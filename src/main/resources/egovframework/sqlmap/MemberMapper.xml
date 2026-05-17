@@ -5,29 +5,108 @@
 <mapper namespace="egovframework.member.mapper.MemberMapper">
 
     <resultMap id="memberResultMap" type="egovframework.member.vo.MemberVO">
-        <id     property="memberId"  column="member_id"/>
-        <result property="password"  column="password"/>
-        <result property="name"      column="name"/>
-        <result property="email"     column="email"/>
-        <result property="role"      column="role"/>
+        <id     property="memberId"   column="member_id"/>
+        <result property="password"   column="password"/>
+        <result property="name"       column="name"/>
+        <result property="email"      column="email"/>
+        <result property="role"       column="role"/>
+        <result property="status"     column="status"/>
+        <result property="department" column="department"/>
+        <result property="empNo"      column="emp_no"/>
+        <result property="birthDate"  column="birth_date"/>
+        <result property="phone"      column="phone"/>
+        <result property="position"   column="position"/>
+        <result property="gender"     column="gender"/>
+        <result property="deptId"   column="dept_id"/>
+		<result property="deptName" column="dept_name"/>
     </resultMap>
 
+    <!-- 회원가입 INSERT (status=PENDING으로 저장) -->
     <insert id="insertMember" parameterType="egovframework.member.vo.MemberVO">
-        INSERT INTO member (member_id, password, name, email, role)
-        VALUES (#{memberId}, #{password}, #{name}, #{email, jdbcType=VARCHAR}, 'USER')
+        INSERT INTO member (
+            member_id, password, name, email, role,
+            status, department, birth_date, phone, gender
+        ) VALUES (
+            #{memberId}, #{password}, #{name}, #{email, jdbcType=VARCHAR}, 'USER',
+            'PENDING', #{department, jdbcType=VARCHAR}, #{birthDate, jdbcType=VARCHAR},
+            #{phone, jdbcType=VARCHAR}, #{gender, jdbcType=VARCHAR}
+        )
     </insert>
 
+  <!-- status 상관없이 아이디 중복체크용 조회 -->
+   <select id="selectMemberById" parameterType="String" resultMap="memberResultMap">
+    SELECT member_id, password, name, email, role, status
+    FROM   member
+    WHERE  member_id = #{memberId}
+  </select>
+
+    <!-- 로그인 시 status=ACTIVE 인 사람만 조회 -->
     <select id="selectMember" parameterType="String" resultMap="memberResultMap">
-        SELECT member_id, password, name, email, role
+        SELECT member_id, password, name, email, role, status,
+               department, emp_no, birth_date, phone, position, gender
         FROM   member
         WHERE  member_id = #{memberId}
+        AND    status = 'ACTIVE'
     </select>
 
     <!-- 결재자 목록 (전체 회원) -->
     <select id="selectMemberList" resultMap="memberResultMap">
-        SELECT member_id, name, role
+        SELECT member_id, name, role, status, department
         FROM   member
         ORDER BY name
     </select>
 
+    <!-- 가입 신청 목록 (PENDING 상태) -->
+    <select id="selectPendingList" resultMap="memberResultMap">
+        SELECT member_id, name, email, department, birth_date, phone, gender, created_at
+        FROM   member
+        WHERE  status = 'PENDING'
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 승인/거절 처리 -->
+    <update id="updateMemberStatus" parameterType="egovframework.member.vo.MemberVO">
+        UPDATE member
+        SET status = #{status}
+        WHERE member_id = #{memberId}
+    </update>
+<!-- 직원 목록 조회 (ACTIVE 상태만, 이름/사번 검색 가능) -->
+  <select id="selectEmpList" parameterType="egovframework.member.vo.MemberVO" resultMap="memberResultMap">
+    SELECT m.member_id, m.name, m.email, m.role, m.status,
+           m.department, m.emp_no, m.phone, m.position, m.gender, m.birth_date,
+           m.dept_id, d.dept_name
+    FROM   member m
+    LEFT JOIN department d ON m.dept_id = d.dept_id
+    WHERE  m.status = 'ACTIVE'
+    <if test="keyword != null and keyword != ''">
+        AND (m.name LIKE CONCAT('%', #{keyword}, '%')
+        OR m.emp_no LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    <if test="deptId != null and deptId != ''">
+        AND m.dept_id = #{deptId}
+    </if>
+    ORDER BY m.name
+</select>
+
+
+
+    <!-- 직원 정보 수정 -->
+    <update id="updateMember" parameterType="egovframework.member.vo.MemberVO">
+    UPDATE member
+    SET name       = #{name},
+        email      = #{email, jdbcType=VARCHAR},
+        department = #{department, jdbcType=VARCHAR},
+        position   = #{position, jdbcType=VARCHAR},
+        phone      = #{phone, jdbcType=VARCHAR},
+        role       = #{role},
+        emp_no     = #{empNo, jdbcType=VARCHAR}
+    WHERE member_id = #{memberId}
+</update>
+
+    <!-- 직원 삭제 -->
+    <delete id="deleteMember" parameterType="String">
+        DELETE FROM member
+        WHERE member_id = #{memberId}
+    </delete>
+    
 </mapper>
