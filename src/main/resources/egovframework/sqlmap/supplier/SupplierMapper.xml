@@ -13,11 +13,110 @@
         <result property="isActive"     column="is_active"/>
     </resultMap>
 
+    <!-- ── 기존: 결재 폼 드롭다운용 (활성만) ── -->
     <select id="selectSupplierList" resultMap="supplierResultMap">
         SELECT supplier_id, supplier_name, contact, phone, address, is_active
         FROM   supplier
         WHERE  is_active = 1
         ORDER BY supplier_name
+    </select>
+
+    <!-- ── 거래처 관리 목록 (검색 조건 + 전체/활성/비활성) ── -->
+    <select id="selectSupplierListAll"
+            parameterType="egovframework.supplier.vo.SupplierVO"
+            resultMap="supplierResultMap">
+        SELECT supplier_id, supplier_name, contact, phone, address, is_active
+        FROM   supplier
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                (supplier_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR contact    LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR phone      LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchActive != null and searchActive != ''">
+                AND is_active = #{searchActive}
+            </if>
+        </where>
+        ORDER BY supplier_name
+    </select>
+
+    <!-- ── 건수 ── -->
+    <select id="selectSupplierCount"
+            parameterType="egovframework.supplier.vo.SupplierVO"
+            resultType="int">
+        SELECT COUNT(*) FROM supplier
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                (supplier_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR contact    LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR phone      LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchActive != null and searchActive != ''">
+                AND is_active = #{searchActive}
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 단건 조회 ── -->
+    <select id="selectSupplier" parameterType="long" resultMap="supplierResultMap">
+        SELECT supplier_id, supplier_name, contact, phone, address, is_active
+        FROM   supplier
+        WHERE  supplier_id = #{supplierId}
+    </select>
+
+    <!-- ── 등록 ── -->
+    <insert id="insertSupplier"
+            parameterType="egovframework.supplier.vo.SupplierVO"
+            useGeneratedKeys="true" keyProperty="supplierId">
+        INSERT INTO supplier (supplier_name, contact, phone, address, is_active)
+        VALUES (#{supplierName}, #{contact}, #{phone}, #{address}, #{isActive})
+    </insert>
+
+    <!-- ── 수정 ── -->
+    <update id="updateSupplier" parameterType="egovframework.supplier.vo.SupplierVO">
+        UPDATE supplier
+        SET supplier_name = #{supplierName},
+            contact       = #{contact},
+            phone         = #{phone},
+            address       = #{address},
+            is_active     = #{isActive}
+        WHERE supplier_id = #{supplierId}
+    </update>
+
+    <!-- ── 비활성화 (논리 삭제) ── -->
+    <update id="deactivateSupplier" parameterType="long">
+        UPDATE supplier SET is_active = 0 WHERE supplier_id = #{supplierId}
+    </update>
+
+    <!-- ── 공급업체별 거래 이력 (INBOUND 결재) ── -->
+    <select id="selectSupplierTradeList" parameterType="long"
+            resultType="egovframework.partner.vo.PartnerTradeVO">
+        SELECT
+            '결재문서'                                           AS tradeType,
+            d.doc_type                                           AS docType,
+            d.doc_no                                             AS docNo,
+            d.title                                              AS title,
+            d.status                                             AS status,
+            CASE d.status
+                WHEN 'PENDING'     THEN '기안중'
+                WHEN 'IN_PROGRESS' THEN '진행중'
+                WHEN 'APPROVED'    THEN '결재완료'
+                WHEN 'REJECTED'    THEN '반려'
+                ELSE d.status
+            END                                                  AS statusLabel,
+            DATE_FORMAT(d.created_at, '%Y-%m-%d %H:%i')         AS tradeDate,
+            m.name                                               AS requesterName,
+            d.doc_id                                             AS refId
+        FROM   approval_doc d
+        LEFT JOIN member m ON d.requester_id = m.member_id
+        WHERE  d.supplier_id = #{supplierId}
+          AND  d.doc_type = 'INBOUND'
+        ORDER BY d.created_at DESC
+    </select>
+
+    <select id="selectSupplierTradeCount" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM approval_doc
+        WHERE  supplier_id = #{supplierId} AND doc_type = 'INBOUND'
     </select>
 
 </mapper>

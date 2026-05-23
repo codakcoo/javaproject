@@ -23,18 +23,6 @@
         <result property="warehouseType"  column="warehouse_type"/>
     </resultMap>
 
-    <resultMap id="salesResultMap" type="egovframework.product.vo.SalesVO">
-        <id     property="soId"           column="so_id"/>
-        <result property="soNo"           column="so_no"/>
-        <result property="customerId"     column="customer_id"/>
-        <result property="customerName"   column="customer_name"/>
-        <result property="orderDate"      column="order_date"/>
-        <result property="deliveryDate"   column="delivery_date"/>
-        <result property="status"         column="status"/>
-        <result property="createdBy"      column="created_by"/>
-        <result property="createdAt"      column="created_at"/>
-    </resultMap>
-
     <!-- ============================================================ -->
     <!--  상품 관리                                                      -->
     <!-- ============================================================ -->
@@ -105,64 +93,6 @@
     <delete id="deleteInventoryByProductId" parameterType="Long">
         DELETE FROM INVENTORY WHERE product_id = #{productId}
     </delete>
-
-    <!-- ============================================================ -->
-    <!--  판매 현황 (SALES_ORDER)                                        -->
-    <!-- ============================================================ -->
-    <select id="selectSalesList" parameterType="egovframework.product.vo.SalesVO"
-            resultMap="salesResultMap">
-        SELECT s.so_id, s.so_no, s.customer_id, c.customer_name,
-               DATE_FORMAT(s.order_date, '%Y-%m-%d')    AS order_date,
-               DATE_FORMAT(s.delivery_date, '%Y-%m-%d') AS delivery_date,
-               s.status, s.created_by,
-               DATE_FORMAT(s.created_at, '%Y-%m-%d')    AS created_at
-        FROM   SALES_ORDER s
-        LEFT JOIN CUSTOMER c ON s.customer_id = c.customer_id
-        <where>
-            <if test="searchKeyword != null and searchKeyword != ''">
-                AND (c.customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                  OR s.so_no         LIKE CONCAT('%', #{searchKeyword}, '%'))
-            </if>
-            <if test="searchStatus != null and searchStatus != ''">
-                AND s.status = #{searchStatus}
-            </if>
-            <if test="dateFrom != null and dateFrom != ''">
-                AND s.order_date &gt;= #{dateFrom}
-            </if>
-            <if test="dateTo != null and dateTo != ''">
-                AND s.order_date &lt;= #{dateTo}
-            </if>
-        </where>
-        ORDER BY s.created_at DESC
-    </select>
-
-    <select id="selectSalesCount" parameterType="egovframework.product.vo.SalesVO"
-            resultType="int">
-        SELECT COUNT(*)
-        FROM   SALES_ORDER s
-        LEFT JOIN CUSTOMER c ON s.customer_id = c.customer_id
-        <where>
-            <if test="searchKeyword != null and searchKeyword != ''">
-                AND (c.customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                  OR s.so_no         LIKE CONCAT('%', #{searchKeyword}, '%'))
-            </if>
-            <if test="searchStatus != null and searchStatus != ''">
-                AND s.status = #{searchStatus}
-            </if>
-            <if test="dateFrom != null and dateFrom != ''">
-                AND s.order_date &gt;= #{dateFrom}
-            </if>
-            <if test="dateTo != null and dateTo != ''">
-                AND s.order_date &lt;= #{dateTo}
-            </if>
-        </where>
-    </select>
-
-    <insert id="insertSales" parameterType="egovframework.product.vo.SalesVO"
-            useGeneratedKeys="true" keyProperty="soId">
-        INSERT INTO SALES_ORDER (so_no, customer_id, order_date, delivery_date, status, created_by)
-        VALUES (#{soNo}, #{customerId}, #{orderDate}, #{deliveryDate}, #{status}, #{createdBy})
-    </insert>
 
     <!-- ============================================================ -->
     <!--  재고 현황 - 불량창고 제외 (기본)                                  -->
