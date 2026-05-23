@@ -97,9 +97,10 @@
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
         <div class="nav-sub" id="productMenu">
-            <a href="${pageContext.request.contextPath}/product/list.do" class="nav-item" onclick="closeSidebar()">상품 관리</a>
-            <a href="${pageContext.request.contextPath}/sales/list.do"   class="nav-item" onclick="closeSidebar()">판매 현황</a>
-            <a href="${pageContext.request.contextPath}/stock/list.do"   class="nav-item" onclick="closeSidebar()">재고 현황</a>
+            <a href="${pageContext.request.contextPath}/product/list.do"          class="nav-item" onclick="closeSidebar()">상품 관리</a>
+            <a href="${pageContext.request.contextPath}/stock/list.do"            class="nav-item" onclick="closeSidebar()">재고 현황</a>
+            <a href="${pageContext.request.contextPath}/partner/customer/list.do" class="nav-item" onclick="closeSidebar()">고객사 관리</a>
+            <a href="${pageContext.request.contextPath}/partner/supplier/list.do" class="nav-item" onclick="closeSidebar()">공급업체 관리</a>
         </div>
     </div>
 

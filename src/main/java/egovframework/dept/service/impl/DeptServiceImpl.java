@@ -34,4 +34,10 @@ public class DeptServiceImpl implements DeptService {
         if (deptMapper.countByDeptName(deptName, excludeId) > 0) return "부서명";
         return null;
     }
+
+	@Override
+	public boolean isDeptDuplicate(String deptId, String deptName) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
