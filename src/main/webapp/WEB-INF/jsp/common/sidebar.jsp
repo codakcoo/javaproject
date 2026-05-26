@@ -79,6 +79,17 @@
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
+		<div class="nav-sub <%= uri.contains("/hr") || uri.contains("/dept") ? "open" : "" %>" id="hrMenu">
+            <a href="${pageContext.request.contextPath}/hr/list.do"
+               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>"
+               onclick="closeSidebar()">직원 목록</a>
+         	<a href="${pageContext.request.contextPath}/dept/list.do"
+   				class="nav-item <%= uri.contains("/dept") ? "active" : "" %>"
+   				onclick="closeSidebar()">부서 관리</a>
+            <a href="${pageContext.request.contextPath}/hr/approval.do"
+      	 	    class="nav-item <%= uri.contains("/hr/approval") ? "active" : "" %>"
+      	        onclick="closeSidebar()">가입 승인 관리</a>
+        
         <div class="nav-sub" id="hrMenu">
             <a href="${pageContext.request.contextPath}/hr/list.do"     class="nav-item" onclick="closeSidebar()">직원 목록</a>
             <a href="${pageContext.request.contextPath}/dept/list.do"   class="nav-item" onclick="closeSidebar()">부서 관리</a>
@@ -123,6 +134,15 @@
         </div>
     </div>
 
+  <!-- 주문관리 -->
+<!-- 주문관리 -->
+<div class="nav-group">
+    <div class="nav-group-title">주문관리</div>
+    <div class="nav-item nav-toggle <%= uri.contains("/order") || uri.contains("/ocr") ? "open" : "" %>"
+         onclick="toggleMenu('orderMenu', this)">
+        <div class="toggle-left">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            주문내역
     <!-- 주문관리 -->
     <div class="nav-group">
         <div class="nav-group-title">주문관리</div>
@@ -136,7 +156,17 @@
         <div class="nav-sub" id="orderMenu">
             <a href="${pageContext.request.contextPath}/order/list.do" class="nav-item" onclick="closeSidebar()">주문내역</a>
         </div>
+        <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
     </div>
+    <div class="nav-sub <%= uri.contains("/order") || uri.contains("/ocr") ? "open" : "" %>" id="orderMenu">
+        <a href="${pageContext.request.contextPath}/order/list.do"
+           class="nav-item <%= uri.contains("/order/list") ? "active" : "" %>"
+           onclick="closeSidebar()">주문내역</a>
+        <a href="${pageContext.request.contextPath}/ocr/upload.do"
+           class="nav-item <%= uri.contains("/ocr") ? "active" : "" %>"
+           onclick="closeSidebar()">영수증 OCR</a>
+    </div>
+</div>
 
     <!-- 급여관리 -->
     <div class="nav-group">
@@ -152,6 +182,15 @@
             <a href="${pageContext.request.contextPath}/salary/list.do" class="nav-item" onclick="closeSidebar()">급여 목록</a>
             <a href="${pageContext.request.contextPath}/salary/my.do"   class="nav-item" onclick="closeSidebar()">내 급여</a>
         </div>
+        <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+    </div>
+    <div class="nav-sub <%= uri.contains("/salary") ? "open" : "" %>" id="salaryMenu">
+     <a href="${pageContext.request.contextPath}/salary/list.do"
+   class="nav-item <%= uri.contains("/salary/list") ? "active" : "" %>"
+   onclick="closeSidebar()">급여 목록</a>
+        <a href="${pageContext.request.contextPath}/salary/my.do"
+           class="nav-item <%= uri.contains("/salary/my") ? "active" : "" %>"
+           onclick="closeSidebar()">내 급여</a>
     </div>
 
     <div class="sb-ver">ERP v1.0 · eGovFrame 4.3</div>
@@ -187,6 +226,16 @@
 function toggleMenu(menuId, btn) {
     var menu   = document.getElementById(menuId);
     var isOpen = menu.classList.contains('open');
+    // 다른 메뉴 닫기
+    document.querySelectorAll('.nav-sub').forEach(function(m) {
+        if (m.id !== menuId) m.classList.remove('open');
+    });
+    document.querySelectorAll('.nav-toggle').forEach(function(b) {
+        if (b !== btn) b.classList.remove('open');
+    });
+    // 현재 메뉴 토글
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
     document.querySelectorAll('.nav-sub').forEach(function (m) {
         if (m.id !== menuId) m.classList.remove('open');
     });
