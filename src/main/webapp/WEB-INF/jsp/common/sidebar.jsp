@@ -197,23 +197,27 @@
         </div>
     </div>
 
-    <!-- 주문관리 -->
-    <div class="nav-group">
-        <div class="nav-group-title">주문관리</div>
-  <div class="nav-item nav-toggle <%= uri.contains("/hr") || uri.contains("/dept") ? "open" : "" %>"
-     onclick="toggleMenu('hrMenu', this)">
-            <div class="toggle-left">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                주문내역
-            </div>
-            <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+  <!-- 주문관리 -->
+<!-- 주문관리 -->
+<div class="nav-group">
+    <div class="nav-group-title">주문관리</div>
+    <div class="nav-item nav-toggle <%= uri.contains("/order") || uri.contains("/ocr") ? "open" : "" %>"
+         onclick="toggleMenu('orderMenu', this)">
+        <div class="toggle-left">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            주문내역
         </div>
-        <div class="nav-sub" id="orderMenu">
-            <a href="${pageContext.request.contextPath}/order/list.do"
-               class="nav-item <%= uri.contains("/list") ? "active" : "" %>"
-               onclick="closeSidebar()">주문내역</a>
-        </div>
+        <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
     </div>
+    <div class="nav-sub <%= uri.contains("/order") || uri.contains("/ocr") ? "open" : "" %>" id="orderMenu">
+        <a href="${pageContext.request.contextPath}/order/list.do"
+           class="nav-item <%= uri.contains("/order/list") ? "active" : "" %>"
+           onclick="closeSidebar()">주문내역</a>
+        <a href="${pageContext.request.contextPath}/ocr/upload.do"
+           class="nav-item <%= uri.contains("/ocr") ? "active" : "" %>"
+           onclick="closeSidebar()">영수증 OCR</a>
+    </div>
+</div>
 
     <div class="sb-ver">ERP v1.0 · eGovFrame 4.3</div>
     <!--  급여관리 HTML  -->
