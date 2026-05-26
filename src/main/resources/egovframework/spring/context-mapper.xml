@@ -18,4 +18,17 @@
                    egovframework.supplier.mapper,
                    egovframework.customer.mapper" />
     </bean>
+<bean class="org.egovframe.rte.psl.dataaccess.mapper.MapperConfigurer">
+    <property name="basePackage"
+        value="egovframework.member.mapper,
+               egovframework.product.mapper,
+               egovframework.approval.mapper,
+               egovframework.order.mapper,
+               egovframework.salary.mapper,
+               egovframework.dept.mapper,
+               egovframework.supplier.mapper,
+               egovframework.customer.mapper" />
+</bean>
+                   
+
 </beans>

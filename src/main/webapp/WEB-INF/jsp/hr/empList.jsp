@@ -62,10 +62,10 @@
     width: 100%;
 }
 table {
-    min-width: 700px;
+    min-width: 770px;
     width: 100%;
     border-collapse: collapse;
-    talbe-layout: fixed;
+    table-layout: fixed;
 }
 
     /* ── 모바일 반응형 ── */
@@ -99,7 +99,7 @@ table {
     tbody tr { border-bottom: 1px solid #F1F5F9; transition: background 0.1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #F8FAFF; }
-    tbody td { padding: 11px 16px; font-size: 13px; color: var(--text); }
+    tbody td { padding: 11px 16px; font-size: 13px; color: var(--text); white-space: nowrap; }
 
     .status-badge {
         display: inline-block; padding: 3px 9px;
@@ -192,23 +192,14 @@ table {
         <table>
          <thead>
     <tr>
- 
         <th style="width:100px;">사번</th>
-        <th style="width:80px;">이름</th>
-        <th style="width:80px;">부서</th>
-        <th style="width:60px;">직급</th>
-        <th style="width:160px;">이메일</th>
-        <th style="width:130px;">연락처</th>
-        <th style="width:60px;">상태</th>
+        <th style="width:90px;">이름</th>
+        <th style="width:90px;">부서</th>
+        <th style="width:80px;">직급</th>
+        <th style="width:180px;">이메일</th>
+        <th style="width:140px;">연락처</th>
+        <th style="width:70px;">상태</th>
         <th style="width:120px;">관리</th>
-        <th>사번</th>
-        <th>이름</th>
-        <th>부서</th>
-        <th>직급</th>
-        <th>이메일</th>
-        <th>연락처</th>
-        <th>상태</th>
-        <th>관리</th>
     </tr>
 </thead>
            <tbody>
