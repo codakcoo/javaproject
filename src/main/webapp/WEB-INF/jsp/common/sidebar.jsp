@@ -136,6 +136,7 @@
         <div class="nav-sub" id="orderMenu">
             <a href="${pageContext.request.contextPath}/order/list.do"  class="nav-item" onclick="closeSidebar()">주문내역</a>
             <a href="${pageContext.request.contextPath}/ocr/upload.do"  class="nav-item" onclick="closeSidebar()">영수증 OCR</a>
+            <a href="${pageContext.request.contextPath}/ocr/verify.do"  class="nav-item" onclick="closeSidebar()">OCR 검증</a>
         </div>
     </div>
 

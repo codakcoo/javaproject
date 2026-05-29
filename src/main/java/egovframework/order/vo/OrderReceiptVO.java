@@ -13,12 +13,14 @@ public class OrderReceiptVO {
     private String requesterId;
     private String approverId;
     private Double totalAmount;
+    private String status;        // PENDING / CONFIRMED / REJECTED
+    private String confirmedNo;   // ★ OCR 확정 번호 (OCR-CONF-YYYYMMDDHHMMSS)
     private String createdAt;
 
     // JOIN 조회용
     private String requesterName;
     private String approverName;
-    private String docNo;         // 원본 결재 문서번호
+    private String docNo;
 
     // 상품 라인 목록
     private List<OrderReceiptItemVO> items;
@@ -26,6 +28,7 @@ public class OrderReceiptVO {
     // 검색 조건
     private String searchDocType;
     private String searchKeyword;
+    private String searchStatus;
 
     public Long   getReceiptId()             { return receiptId; }
     public void   setReceiptId(Long v)       { this.receiptId = v; }
@@ -45,6 +48,10 @@ public class OrderReceiptVO {
     public void   setApproverId(String v)    { this.approverId = v; }
     public Double getTotalAmount()           { return totalAmount; }
     public void   setTotalAmount(Double v)   { this.totalAmount = v; }
+    public String getStatus()                { return status; }
+    public void   setStatus(String v)        { this.status = v; }
+    public String getConfirmedNo()           { return confirmedNo; }   // ★
+    public void   setConfirmedNo(String v)   { this.confirmedNo = v; } // ★
     public String getCreatedAt()             { return createdAt; }
     public void   setCreatedAt(String v)     { this.createdAt = v; }
     public String getRequesterName()         { return requesterName; }
@@ -59,4 +66,6 @@ public class OrderReceiptVO {
     public void   setSearchDocType(String v) { this.searchDocType = v; }
     public String getSearchKeyword()         { return searchKeyword; }
     public void   setSearchKeyword(String v) { this.searchKeyword = v; }
+    public String getSearchStatus()          { return searchStatus; }
+    public void   setSearchStatus(String v)  { this.searchStatus = v; }
 }
