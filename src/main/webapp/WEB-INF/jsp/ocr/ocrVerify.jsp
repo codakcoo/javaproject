@@ -163,7 +163,7 @@ function confirmOne(id) {
     fetch(ctx + '/ocr/confirm.do?receiptId=' + id, { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(t) {
-            if (t === 'OK') {
+        	if (t.startsWith('OK')) {
                 document.getElementById('card-' + id).remove();
                 updateCount(-1);
             }
