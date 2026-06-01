@@ -35,9 +35,8 @@ public class DeptServiceImpl implements DeptService {
         return null;
     }
 
-	@Override
-	public boolean isDeptDuplicate(String deptId, String deptName) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isDeptDuplicate(String deptId, String deptName) {
+        return deptMapper.countByDeptId(deptId) > 0 || deptMapper.countByDeptName(deptName, null) > 0;
+    }
 }
