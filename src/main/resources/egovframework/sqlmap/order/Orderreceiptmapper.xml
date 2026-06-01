@@ -15,6 +15,8 @@
         <result property="requesterId"  column="requester_id"/>
         <result property="approverId"   column="approver_id"/>
         <result property="totalAmount"  column="total_amount"/>
+        <result property="status"       column="status"/>
+        <result property="confirmedNo"  column="confirmed_no"/>
         <result property="createdAt"    column="created_at"/>
         <result property="requesterName" column="requester_name"/>
         <result property="approverName"  column="approver_name"/>
@@ -40,7 +42,13 @@
         SELECT r.receipt_id, r.receipt_no, r.doc_id, r.doc_type,
                DATE_FORMAT(r.order_date, '%Y-%m-%d %H:%i') AS order_date,
                r.partner_name, r.requester_id, r.approver_id,
-               r.total_amount,
+               r.total_amount, r.status, COALESCE(
+										    r.confirmed_no,
+										    CASE WHEN r.status = 'CONFIRMED' AND r.receipt_no LIKE 'OCR-%'
+										         THEN CONCAT('OCR-CONF-', DATE_FORMAT(r.created_at, '%Y%m%d%H%i%s'), '-', r.receipt_id)
+										         ELSE NULL
+										    END
+										) AS confirmed_no,
                DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i') AS created_at,
                req.name AS requester_name,
                apr.name AS approver_name,
@@ -54,8 +62,11 @@
                 r.doc_type = #{searchDocType}
             </if>
             <if test="searchKeyword != null and searchKeyword != ''">
-                AND (r.receipt_no    LIKE CONCAT('%', #{searchKeyword}, '%')
-                  OR r.partner_name  LIKE CONCAT('%', #{searchKeyword}, '%'))
+                AND (r.receipt_no   LIKE CONCAT('%', #{searchKeyword}, '%')
+                  OR r.partner_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchStatus != null and searchStatus != ''">
+                AND r.status = #{searchStatus}
             </if>
         </where>
         ORDER BY r.created_at DESC
@@ -74,6 +85,9 @@
                 AND (r.receipt_no   LIKE CONCAT('%', #{searchKeyword}, '%')
                   OR r.partner_name LIKE CONCAT('%', #{searchKeyword}, '%'))
             </if>
+            <if test="searchStatus != null and searchStatus != ''">
+                AND r.status = #{searchStatus}
+            </if>
         </where>
     </select>
 
@@ -82,7 +96,13 @@
         SELECT r.receipt_id, r.receipt_no, r.doc_id, r.doc_type,
                DATE_FORMAT(r.order_date, '%Y-%m-%d %H:%i') AS order_date,
                r.partner_name, r.requester_id, r.approver_id,
-               r.total_amount,
+               r.total_amount, r.status, COALESCE(
+										    r.confirmed_no,
+										    CASE WHEN r.status = 'CONFIRMED' AND r.receipt_no LIKE 'OCR-%'
+										         THEN CONCAT('OCR-CONF-', DATE_FORMAT(r.created_at, '%Y%m%d%H%i%s'), '-', r.receipt_id)
+										         ELSE NULL
+										    END
+										) AS confirmed_no,
                DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i') AS created_at,
                req.name AS requester_name,
                apr.name AS approver_name,
@@ -104,31 +124,89 @@
         ORDER BY item_id
     </select>
 
-    <!-- ── 주문 등록 ──────────────────────────── -->
+    <!-- ── 주문 등록 ─────────────────────────── -->
     <insert id="insertReceipt"
             parameterType="egovframework.order.vo.OrderReceiptVO"
             useGeneratedKeys="true" keyProperty="receiptId">
         INSERT INTO order_receipt
             (receipt_no, doc_id, doc_type, order_date,
-             partner_name, requester_id, approver_id, total_amount, created_at)
+             partner_name, requester_id, approver_id,
+             total_amount, status, created_at)
         VALUES
             (#{receiptNo}, #{docId}, #{docType}, NOW(),
-             #{partnerName}, #{requesterId}, #{approverId}, #{totalAmount}, NOW())
+             #{partnerName}, #{requesterId}, #{approverId},
+             #{totalAmount}, 'PENDING', NOW())
     </insert>
 
     <!-- ── 상품 라인 등록 ────────────────────── -->
     <insert id="insertReceiptItem"
             parameterType="egovframework.order.vo.OrderReceiptItemVO">
         INSERT INTO order_receipt_item
-            (receipt_id, product_id, product_code, product_name, unit, qty, unit_cost, amount)
+            (receipt_id, product_id, product_code, product_name,
+             unit, qty, unit_cost, amount)
         VALUES
             (#{receiptId}, #{productId}, #{productCode}, #{productName},
              #{unit}, #{qty}, #{unitCost}, #{amount})
     </insert>
 
-    <!-- ── doc_id로 중복 체크 ───────────────── -->
+    <!-- ── doc_id 중복 체크 ──────────────────── -->
     <select id="countByDocId" parameterType="long" resultType="int">
         SELECT COUNT(*) FROM order_receipt WHERE doc_id = #{docId}
     </select>
+
+    <!-- ── 검증 대기 목록 ─────────────────────── -->
+    <select id="selectPendingList" resultMap="receiptResultMap">
+        SELECT r.receipt_id, r.receipt_no, r.doc_id, r.doc_type,
+               DATE_FORMAT(r.order_date, '%Y-%m-%d %H:%i') AS order_date,
+               r.partner_name, r.requester_id, r.approver_id,
+               r.total_amount, r.status, r.confirmed_no,
+               DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i') AS created_at,
+               req.name AS requester_name
+        FROM   order_receipt r
+        LEFT JOIN member req ON r.requester_id = req.member_id
+        WHERE  r.status     = 'PENDING'
+          AND  r.receipt_no LIKE 'OCR-%'
+        ORDER BY r.created_at ASC
+    </select>
+
+    <!-- ── 중복 의심 체크 ─────────────────────── -->
+    <select id="countDuplicate" resultType="int">
+        SELECT COUNT(*)
+        FROM   order_receipt
+        WHERE  partner_name = #{partnerName}
+          AND  total_amount = #{totalAmount}
+          AND  status       = 'CONFIRMED'
+          AND  DATE(created_at) = CURDATE()
+          AND  receipt_id  != #{excludeId}
+    </select>
+
+    <!-- ── 상태만 변경 (REJECTED 용) ─────────── -->
+    <update id="updateStatus">
+        UPDATE order_receipt
+        SET    status = #{status}
+        WHERE  receipt_id = #{receiptId}
+    </update>
+
+    <!-- ★ 확정: status=CONFIRMED + confirmed_no 동시 저장 ── -->
+    <update id="confirmReceipt">
+        UPDATE order_receipt
+        SET    status       = 'CONFIRMED',
+               confirmed_no = #{confirmedNo}
+        WHERE  receipt_id = #{receiptId}
+    </update>
+
+    <!-- ── 상품 라인 수정 ─────────────────────── -->
+    <update id="updateReceiptItem"
+            parameterType="egovframework.order.vo.OrderReceiptItemVO">
+        UPDATE order_receipt_item
+        SET    product_id   = #{productId},
+               product_code = #{productCode},
+               product_name = #{productName},
+               unit         = #{unit},
+               qty          = #{qty},
+               unit_cost    = #{unitCost},
+               amount       = #{amount}
+        WHERE  item_id = #{itemId}
+    </update>
 
 </mapper>

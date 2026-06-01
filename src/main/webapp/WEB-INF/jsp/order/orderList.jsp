@@ -139,7 +139,25 @@
                                     <c:when test="${r.docType == 'STOCK_ADJ'}"><span class="dtype dtype-adj">재고조정</span></c:when>
                                 </c:choose>
                             </td>
-                            <td align="center" style="font-size:11px;color:var(--muted)">${r.docNo}</td>
+                            <td align="center" style="font-size:11px;color:var(--muted)">
+                                <c:choose>
+                                    <%-- 결재 연결 주문: 결재번호 표시 --%>
+                                    <c:when test="${not empty r.docNo}">${r.docNo}</c:when>
+                                    <%-- OCR 확정 주문: OCR 전용 결재번호 표시 --%>
+                                    <c:when test="${not empty r.confirmedNo}">
+                                        <span style="color:#059669;font-size:10px;">${r.confirmedNo}</span>
+                                    </c:when>
+                                    <%-- OCR 반려 주문: 반려 배지 --%>
+                                    <c:when test="${r.status == 'REJECTED'}">
+                                        <span style="background:#FFF1F2;color:#E11D48;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;">반려</span>
+                                    </c:when>
+                                    <%-- OCR 대기 주문: 검증 대기 배지 --%>
+                                    <c:when test="${r.status == 'PENDING'}">
+                                        <span style="background:#FFFBEB;color:#D97706;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;">검증대기</span>
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </td>
                             <td align="center">${r.requesterName}</td>
                             <td align="center">${empty r.approverName ? '-' : r.approverName}</td>
                             <td align="center" style="font-size:11px">${empty r.partnerName ? '-' : r.partnerName}</td>
