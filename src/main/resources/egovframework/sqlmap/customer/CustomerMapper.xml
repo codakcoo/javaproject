@@ -13,11 +13,139 @@
         <result property="isActive"     column="is_active"/>
     </resultMap>
 
+    <!-- ── 기존: 결재 폼 드롭다운용 (활성만) ── -->
     <select id="selectCustomerList" resultMap="customerResultMap">
         SELECT customer_id, customer_name, contact, phone, address, is_active
         FROM   customer
         WHERE  is_active = 1
         ORDER BY customer_name
+    </select>
+
+    <!-- ── 거래처 관리 목록 (검색 조건 + 전체/활성/비활성) ── -->
+    <select id="selectCustomerListAll"
+            parameterType="egovframework.customer.vo.CustomerVO"
+            resultMap="customerResultMap">
+        SELECT customer_id, customer_name, contact, phone, address, is_active
+        FROM   customer
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                (customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR contact    LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR phone      LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchActive != null and searchActive != ''">
+                AND is_active = #{searchActive}
+            </if>
+        </where>
+        ORDER BY customer_name
+    </select>
+
+    <!-- ── 건수 ── -->
+    <select id="selectCustomerCount"
+            parameterType="egovframework.customer.vo.CustomerVO"
+            resultType="int">
+        SELECT COUNT(*) FROM customer
+        <where>
+            <if test="searchKeyword != null and searchKeyword != ''">
+                (customer_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR contact    LIKE CONCAT('%', #{searchKeyword}, '%')
+                 OR phone      LIKE CONCAT('%', #{searchKeyword}, '%'))
+            </if>
+            <if test="searchActive != null and searchActive != ''">
+                AND is_active = #{searchActive}
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 단건 조회 ── -->
+    <select id="selectCustomer" parameterType="long" resultMap="customerResultMap">
+        SELECT customer_id, customer_name, contact, phone, address, is_active
+        FROM   customer
+        WHERE  customer_id = #{customerId}
+    </select>
+
+    <!-- ── 등록 ── -->
+    <insert id="insertCustomer"
+            parameterType="egovframework.customer.vo.CustomerVO"
+            useGeneratedKeys="true" keyProperty="customerId">
+        INSERT INTO customer (customer_name, contact, phone, address, is_active)
+        VALUES (#{customerName}, #{contact}, #{phone}, #{address}, #{isActive})
+    </insert>
+
+    <!-- ── 수정 ── -->
+    <update id="updateCustomer" parameterType="egovframework.customer.vo.CustomerVO">
+        UPDATE customer
+        SET customer_name = #{customerName},
+            contact       = #{contact},
+            phone         = #{phone},
+            address       = #{address},
+            is_active     = #{isActive}
+        WHERE customer_id = #{customerId}
+    </update>
+
+    <!-- ── 비활성화 (논리 삭제) ── -->
+    <update id="deactivateCustomer" parameterType="long">
+        UPDATE customer SET is_active = 0 WHERE customer_id = #{customerId}
+    </update>
+
+    <!-- ── 고객사별 거래 이력 (OUTBOUND 결재 + 수주 UNION) ── -->
+    <select id="selectCustomerTradeList" parameterType="long"
+            resultType="egovframework.partner.vo.PartnerTradeVO">
+        SELECT
+            '결재문서'                                           AS tradeType,
+            d.doc_type                                           AS docType,
+            d.doc_no                                             AS docNo,
+            d.title                                              AS title,
+            d.status                                             AS status,
+            CASE d.status
+                WHEN 'PENDING'     THEN '기안중'
+                WHEN 'IN_PROGRESS' THEN '진행중'
+                WHEN 'APPROVED'    THEN '결재완료'
+                WHEN 'REJECTED'    THEN '반려'
+                ELSE d.status
+            END                                                  AS statusLabel,
+            DATE_FORMAT(d.created_at, '%Y-%m-%d %H:%i')         AS tradeDate,
+            m.name                                               AS requesterName,
+            d.doc_id                                             AS refId
+        FROM   approval_doc d
+        LEFT JOIN member m ON d.requester_id = m.member_id
+        WHERE  d.customer_id = #{customerId}
+          AND  d.doc_type = 'OUTBOUND'
+
+        UNION ALL
+
+        SELECT
+            '수주'                                               AS tradeType,
+            'SALES_ORDER'                                        AS docType,
+            s.so_no                                              AS docNo,
+            CONCAT('수주 ', s.so_no)                             AS title,
+            s.status                                             AS status,
+            CASE s.status
+                WHEN 'DRAFT'     THEN '초안'
+                WHEN 'CONFIRMED' THEN '확정'
+                WHEN 'PICKING'   THEN '피킹중'
+                WHEN 'SHIPPED'   THEN '출하완료'
+                WHEN 'CANCELLED' THEN '취소'
+                ELSE s.status
+            END                                                  AS statusLabel,
+            DATE_FORMAT(s.created_at, '%Y-%m-%d %H:%i')         AS tradeDate,
+            m.name                                               AS requesterName,
+            s.so_id                                              AS refId
+        FROM   sales_order s
+        LEFT JOIN member m ON s.created_by = m.member_id
+        WHERE  s.customer_id = #{customerId}
+
+        ORDER BY tradeDate DESC
+    </select>
+
+    <select id="selectCustomerTradeCount" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM (
+            SELECT doc_id FROM approval_doc
+            WHERE  customer_id = #{customerId} AND doc_type = 'OUTBOUND'
+            UNION ALL
+            SELECT so_id FROM sales_order
+            WHERE  customer_id = #{customerId}
+        ) t
     </select>
 
 </mapper>

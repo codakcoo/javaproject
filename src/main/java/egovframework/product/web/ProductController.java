@@ -3,7 +3,6 @@ package egovframework.product.web;
 import egovframework.member.vo.MemberVO;
 import egovframework.product.service.ProductService;
 import egovframework.product.vo.ProductVO;
-import egovframework.product.vo.SalesVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -118,26 +117,6 @@ public class ProductController {
         } finally {
             if (out != null) out.flush();
         }
-    }
-
-    // ── 판매 현황 ──────────────────────────────────
-    @GetMapping("/sales/list.do")
-    public String salesList(@ModelAttribute SalesVO vo, Model model, HttpSession session) {
-        if (isNotLoggedIn(session)) return "redirect:/login.do";
-        model.addAttribute("salesList",  productService.getSalesList(vo));
-        model.addAttribute("totalCount", productService.getSalesCount(vo));
-        model.addAttribute("searchVO", vo);
-        return "product/salesList";
-    }
-
-    @PostMapping("/sales/insert.do")
-    public String salesInsert(@ModelAttribute SalesVO vo, HttpSession session) {
-        if (isNotLoggedIn(session)) return "redirect:/login.do";
-        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        vo.setCreatedBy(loginUser.getMemberId());
-        if (vo.getStatus() == null || vo.getStatus().isEmpty()) vo.setStatus("DRAFT");
-        productService.addSales(vo);
-        return "redirect:/sales/list.do";
     }
 
     // ── 재고 현황 ──────────────────────────────────
