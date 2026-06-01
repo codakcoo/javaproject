@@ -302,6 +302,10 @@
 <div id="sidebar-overlay" onclick="closeSidebar()"
      style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,0.45);"></div>
 
+<script>window._ctxPath = '${pageContext.request.contextPath}';</script>
+<%@ include file="/WEB-INF/jsp/common/chatbot.jsp" %>
+
+
 <div id="layout">
 
 <script>

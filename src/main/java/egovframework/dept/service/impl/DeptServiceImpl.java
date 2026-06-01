@@ -10,6 +10,7 @@ import java.util.List;
 @Service
 public class DeptServiceImpl implements DeptService {
 
+
     @Autowired
     private DeptMapper deptMapper;
 
@@ -33,5 +34,9 @@ public class DeptServiceImpl implements DeptService {
         if (deptMapper.countByDeptId(deptId) > 0) return "부서코드";
         if (deptMapper.countByDeptName(deptName, excludeId) > 0) return "부서명";
         return null;
+    
+    
+    
     }
+    
 }

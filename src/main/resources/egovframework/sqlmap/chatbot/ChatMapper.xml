@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.chatbot.mapper.ChatMapper">
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         최근 주문내역 N건
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <select id="selectRecentOrders" parameterType="int" resultType="java.util.HashMap">
+        SELECT
+            r.receipt_no,
+            r.doc_type,
+            r.partner_name,
+            r.total_amount,
+            DATE_FORMAT(r.created_at, '%Y-%m-%d') AS order_date
+        FROM order_receipt r
+        ORDER BY r.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         날짜별 거래 집계 (최근 N일)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <select id="selectDailyOrderSummary" parameterType="int" resultType="java.util.HashMap">
+        SELECT
+            DATE_FORMAT(created_at, '%Y-%m-%d') AS order_date,
+            COUNT(*)                             AS order_count,
+            COALESCE(SUM(total_amount), 0)       AS total_amount
+        FROM order_receipt
+        WHERE created_at >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d')
+        ORDER BY order_date DESC
+    </select>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         상품 가격 정보 (최근 등록순 N개)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<select id="selectPriceHistory" parameterType="int" resultType="java.util.HashMap">
+    SELECT
+        i.product_name,
+        i.product_code,
+        i.unit_price,
+        i.qty,
+        i.amount,
+        DATE_FORMAT(r.created_at, '%Y-%m-%d') AS order_date,
+        r.doc_type
+    FROM order_receipt_item i
+    INNER JOIN order_receipt r ON r.receipt_id = i.receipt_id
+    ORDER BY r.created_at DESC
+    LIMIT #{limit}
+</select>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         베스트셀러 TOP N  (order_receipt_item 기준)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <select id="selectBestSellers" parameterType="int" resultType="java.util.HashMap">
+        SELECT
+            i.product_name,
+            COALESCE(i.product_code, '-')  AS product_code,
+            SUM(i.qty)                     AS total_qty,
+            SUM(i.amount)                  AS total_amount
+        FROM order_receipt_item i
+        INNER JOIN order_receipt r ON r.receipt_id = i.receipt_id
+        GROUP BY i.product_name, i.product_code
+        ORDER BY total_qty DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         재고 현황 전체 (불량창고 제외)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <select id="selectStockSummary" resultType="java.util.HashMap">
+        SELECT
+            p.product_name,
+            p.product_code,
+            p.unit,
+            p.reorder_point,
+            COALESCE(inv.qty_on_hand, 0)  AS qty_on_hand,
+            w.warehouse_name
+        FROM product p
+        LEFT JOIN inventory inv ON inv.product_id = p.product_id
+        LEFT JOIN warehouse  w  ON w.warehouse_id  = inv.warehouse_id
+                                AND (w.warehouse_type IS NULL OR w.warehouse_type != 'DEFECT')
+        WHERE p.is_active = 1
+        ORDER BY qty_on_hand ASC
+    </select>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         ERP 전체 현황 요약 (대시보드 수치)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <select id="selectErpSummary" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(*) FROM product WHERE is_active = 1)
+                AS product_count,
+            (SELECT COUNT(*) FROM order_receipt
+              WHERE DATE_FORMAT(created_at,'%Y-%m') = DATE_FORMAT(NOW(),'%Y-%m'))
+                AS month_order_count,
+            (SELECT COALESCE(SUM(total_amount), 0) FROM order_receipt
+              WHERE DATE_FORMAT(created_at,'%Y-%m') = DATE_FORMAT(NOW(),'%Y-%m'))
+                AS month_total,
+            (SELECT COUNT(*)
+               FROM product p
+               LEFT JOIN inventory inv ON inv.product_id = p.product_id
+              WHERE p.is_active = 1 AND COALESCE(inv.qty_on_hand,0) &lt;= p.reorder_point)
+                AS low_stock_count,
+            (SELECT COUNT(*) FROM approval_doc WHERE status IN ('PENDING','IN_PROGRESS'))
+                AS pending_count
+        FROM DUAL
+    </select>
+    <!-- 결재 대기/진행중 -->
+<select id="selectPendingApprovals" resultType="java.util.HashMap">
+    SELECT
+        doc_id,
+        title,
+        status,
+        requester_id,
+        DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at
+    FROM approval_doc
+    WHERE status IN ('PENDING', 'IN_PROGRESS')
+    ORDER BY created_at DESC
+    LIMIT 20
+</select>
+
+<!-- 결재 현황 통계 -->
+<select id="selectApprovalStats" resultType="java.util.HashMap">
+    SELECT
+        SUM(CASE WHEN status = 'PENDING'     THEN 1 ELSE 0 END) AS pending_count,
+        SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) AS progress_count,
+        SUM(CASE WHEN status = 'APPROVED'    THEN 1 ELSE 0 END) AS approved_count,
+        SUM(CASE WHEN status = 'REJECTED'    THEN 1 ELSE 0 END) AS rejected_count
+    FROM approval_doc
+    WHERE DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+</select>
+
+<!-- 재고 입출고 내역 -->
+<select id="selectStockHistory" parameterType="int" resultType="java.util.HashMap">
+    SELECT
+        r.doc_type,
+        i.product_name,
+        i.qty,
+        i.amount,
+        r.partner_name,
+        DATE_FORMAT(r.created_at, '%Y-%m-%d') AS order_date
+    FROM order_receipt_item i
+    INNER JOIN order_receipt r ON r.receipt_id = i.receipt_id
+    ORDER BY r.created_at DESC
+    LIMIT #{limit}
+</select>
+
+<!-- 부서별 급여 합계 -->
+<select id="selectSalarySummary" resultType="java.util.HashMap">
+    SELECT
+        e.dept_name,
+        COUNT(*) AS emp_count,
+        SUM(s.base_salary) AS total_base,
+        SUM(s.net_pay)     AS total_net
+    FROM salary s
+    INNER JOIN employee e ON e.emp_id = s.emp_id
+    WHERE DATE_FORMAT(s.pay_date, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    GROUP BY e.dept_name
+    ORDER BY total_net DESC
+</select>
+
+<!-- 부서별 인원 현황 -->
+<select id="selectDeptHeadcount" resultType="java.util.HashMap">
+    SELECT
+        dept_name,
+        COUNT(*) AS headcount,
+        SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) AS active_count
+    FROM employee
+    GROUP BY dept_name
+    ORDER BY headcount DESC
+</select>
+
+</mapper>
