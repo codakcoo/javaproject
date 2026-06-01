@@ -16,6 +16,7 @@
                    egovframework.salary.mapper,
                    egovframework.dept.mapper,
                    egovframework.supplier.mapper,
-                   egovframework.customer.mapper" />
+                   egovframework.customer.mapper,
+                   egovframework.chatbot.mapper" />
     </bean>
 </beans>

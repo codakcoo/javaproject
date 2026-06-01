@@ -26,7 +26,9 @@ public class ChatController {
     // ── Gemini API 설정 ──────────────────────────────────────────
     // API 키: https://aistudio.google.com/app/apikey 에서 발급
     private static final String GEMINI_API_KEY = "AIzaSyDzDkK6pUyc_zhsLUlMLlbdJ6z8Q1KXQbc";
-    private static final String GEMINI_MODEL = "gemini-2.5-flash-lite";
+    //private static final String GEMINI_MODEL = "gemini-2.5-flash-lite";
+    private static final String GEMINI_MODEL = "gemini-2.0-flash-lite";
+
     // 엔드포인트 (키를 URL 파라미터로 전달)
     private static final String GEMINI_API_URL =
         "https://generativelanguage.googleapis.com/v1beta/models/"
@@ -238,8 +240,12 @@ public class ChatController {
             try {
                 return callGeminiOnce(systemPrompt, userMessage);
             } catch (RuntimeException e) {
-                if (e.getMessage() != null && e.getMessage().contains("503") && i < maxRetry - 1) {
-                    Thread.sleep(2000 * (i + 1)); // 2초, 4초
+                String msg = e.getMessage() != null ? e.getMessage() : "";
+                if (msg.contains("429")) {
+                    // 한도 초과 - 재시도 무의미, 바로 안내 메시지 반환
+                    return "현재 AI 응답 한도에 도달했습니다. 잠시 후 다시 시도해주세요. (보통 1분 이내 복구)";
+                } else if (msg.contains("503") && i < maxRetry - 1) {
+                    Thread.sleep(2000 * (i + 1));
                 } else {
                     throw e;
                 }
