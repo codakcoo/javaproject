@@ -172,5 +172,9 @@
     GROUP BY dept_name
     ORDER BY headcount DESC
 </select>
+<!-- app_config 테이블에서 설정값 조회 -->
+<select id="selectConfig" parameterType="String" resultType="String">
+    SELECT config_value FROM app_config WHERE config_key = #{configKey}
+</select>
 
 </mapper>

@@ -34,6 +34,7 @@ public class HrController {
         model.addAttribute("empList", empList);
         model.addAttribute("keyword", keyword);
         model.addAttribute("deptId", deptId);
+        model.addAttribute("deptList", deptService.getDeptList());
         return "hr/empList";
     }
 

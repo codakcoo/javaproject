@@ -164,12 +164,15 @@ table {
     <!-- 검색 -->
     <form action="${pageContext.request.contextPath}/hr/list.do" method="get">
     <div class="search-card">
-	<select name="deptId" onchange="this.form.submit()">
-    		<option value="">전체 부서</option>
-  	  		<option value="D001" ${deptId == 'D001' ? 'selected' : ''}>개발팀</option>
-  	 	  		<option value="D002" ${deptId == 'D002' ? 'selected' : ''}>인사팀</option>
-	     		<option value="D003" ${deptId == 'D003' ? 'selected' : ''}>영업팀</option>
-	 </select>
+<select name="deptId" onchange="this.form.submit()">
+    <option value="">전체 부서</option>
+    <c:forEach items="${deptList}" var="dept">
+        <option value="${dept.deptId}" ${deptId == dept.deptId ? 'selected' : ''}>
+            ${dept.deptName}
+        </option>
+    </c:forEach>
+</select>
+
         <select name="status">
             <option value="">전체 상태</option>
             <option value="ACTIVE"  <c:if test="${param.status == 'ACTIVE'}">selected</c:if>>재직</option>
