@@ -262,13 +262,12 @@ public class ChatController {
             + objectMapper.writeValueAsString(userMessage) + "}]}]"
             + "}";
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/"
-                + "gemini-2.5-flash-lite" + ":generateContent";
+                + GEMINI_MODEL + ":generateContent?key=" + getApiKey(); // ← key= 방식
 
         URL url = new URL(apiUrl);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
-        con.setRequestProperty("Authorization", "Bearer " + getApiKey());
         con.setDoOutput(true);
         con.setConnectTimeout(10000);
         con.setReadTimeout(30000);
