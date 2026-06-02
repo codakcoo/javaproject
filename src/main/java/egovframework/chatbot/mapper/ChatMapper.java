@@ -43,4 +43,7 @@ public interface ChatMapper {
     /** 부서별 인원 현황 */
     List<Map<String, Object>> selectDeptHeadcount();
     
+    /** app_config 테이블에서 설정값 조회 (Gemini API 키 등) */
+    String selectConfig(String configKey);
+    
 }

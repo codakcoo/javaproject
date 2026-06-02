@@ -1,5 +1,4 @@
 package egovframework.chatbot.web;
-
 import egovframework.chatbot.mapper.ChatMapper;
 import egovframework.member.vo.MemberVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,15 +21,22 @@ import java.util.Map;
 @Controller
 @RequestMapping("/chat")
 public class ChatController {
+	
+	// ── Gemini API 설정 ──────────────────────────────────────────
+	// API 키는 DB의 app_config 테이블에서 가져옵니다.
+	// 팀원이 DB에 키 삽입: INSERT INTO app_config VALUES ('gemini.api.key', 'AIzaSy...키값...');
+	private final String GEMINI_MODEL = "gemini-2.5-flash-lite";
 
-    // ── Gemini API 설정 ──────────────────────────────────────────
-    // API 키: https://aistudio.google.com/app/apikey 에서 발급
-    private static final String GEMINI_API_KEY = "AIzaSyDzDkK6pUyc_zhsLUlMLlbdJ6z8Q1KXQbc";
-    private static final String GEMINI_MODEL = "gemini-2.5-flash-lite";
+	/** DB에서 Gemini API 키 조회 */
+	private String getApiKey() {
+	    try {
+	        return chatMapper.selectConfig("gemini.api.key");
+	    } catch (Exception e) {
+	        return null;
+	    }
+	}
     // 엔드포인트 (키를 URL 파라미터로 전달)
-    private static final String GEMINI_API_URL =
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        + GEMINI_MODEL + ":generateContent?key=" + GEMINI_API_KEY;
+  
 
     @Autowired
     private ChatMapper chatMapper;
@@ -236,7 +242,7 @@ public class ChatController {
         int maxRetry = 3;
         for (int i = 0; i < maxRetry; i++) {
             try {
-                return callGeminiOnce(systemPrompt, userMessage);
+            	return callGeminiOnce(systemPrompt, userMessage);
             } catch (RuntimeException e) {
                 if (e.getMessage() != null && e.getMessage().contains("503") && i < maxRetry - 1) {
                     Thread.sleep(2000 * (i + 1)); // 2초, 4초
@@ -255,14 +261,14 @@ public class ChatController {
             + "\"contents\":[{\"parts\":[{\"text\":"
             + objectMapper.writeValueAsString(userMessage) + "}]}]"
             + "}";
-
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/"
-        	    + GEMINI_MODEL + ":generateContent?key=" + GEMINI_API_KEY;
+                + "gemini-2.5-flash-lite" + ":generateContent";
 
         URL url = new URL(apiUrl);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Authorization", "Bearer " + getApiKey());
         con.setDoOutput(true);
         con.setConnectTimeout(10000);
         con.setReadTimeout(30000);
@@ -272,12 +278,15 @@ public class ChatController {
         }
 
         int status = con.getResponseCode();
+        System.out.println("### Gemini 상태: " + status); // ← 추가
+
         InputStream is = (status == 200) ? con.getInputStream() : con.getErrorStream();
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) sb.append(line);
         }
+        System.out.println("### Gemini 응답: " + sb.toString()); // ← 추가
 
         if (status != 200) {
             throw new RuntimeException("Gemini API 오류 (" + status + "): " + sb);
@@ -299,7 +308,7 @@ public class ChatController {
                 }
             }
         }
-        return "응답을 받지 못했습니다.";
+        return "응답을 받지 못했습니다";
     }
 
     // ── 유틸 ──────────────────────────────────────────────────────
