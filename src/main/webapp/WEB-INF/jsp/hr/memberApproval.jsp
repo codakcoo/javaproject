@@ -178,10 +178,10 @@
                                 <td>${member.gender eq 'M' ? '남성' : '여성'}</td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn-approve"
+                                        <%-- <button class="btn-approve"
                                             onclick="openApproveModal('${member.memberId}', '${member.name}')">승인</button>
                                         <button class="btn-reject"
-                                            onclick="openRejectModal('${member.memberId}', '${member.name}')">거절</button>
+                                            onclick="openRejectModal('${member.memberId}', '${member.name}')">거절</button> --%>
                                         <form action="${pageContext.request.contextPath}/hr/approve.do" method="post" style="display:inline">
                                             <input type="hidden" name="memberId" value="${member.memberId}">
                                             <button type="submit" class="btn-approve"
@@ -191,7 +191,7 @@
                                             <input type="hidden" name="memberId" value="${member.memberId}">
                                             <button type="submit" class="btn-reject"
                                                 onclick="return confirm('${member.name}님을 거절하시겠습니까?')">거절</button>
-                                        </form> --%>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

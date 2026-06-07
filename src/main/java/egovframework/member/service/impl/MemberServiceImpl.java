@@ -73,4 +73,13 @@ public class MemberServiceImpl implements MemberService {
     public MemberVO getMemberById(String memberId) {
         return memberMapper.selectMemberById(memberId);
     }
+    @Override
+    public void insertMember(MemberVO member) {
+        // 비밀번호 BCrypt 암호화
+        if (member.getPassword() != null && !member.getPassword().isEmpty()) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            member.setPassword(encoder.encode(member.getPassword()));
+        }
+        memberMapper.insertMember(member);
+    }
 }

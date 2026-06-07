@@ -106,7 +106,7 @@
         <div>
             <div class="page-title">
                 <c:choose>
-                    <c:when test="${empty emp}">직원 등록</c:when>
+                    <c:when test="${empty member}">직원 등록</c:when>
                     <c:otherwise>직원 수정</c:otherwise>
                 </c:choose>
             </div>
@@ -115,9 +115,9 @@
     </div>
 
     <div class="form-card">
-        <form action="${pageContext.request.contextPath}/hr/<c:choose><c:when test="${empty emp}">insert</c:when><c:otherwise>update</c:otherwise></c:choose>.do" method="post">
-            <c:if test="${not empty emp}">
-                <input type="hidden" name="empId" value="${emp.empId}">
+        <form action="${pageContext.request.contextPath}/hr/<c:choose><c:when test="${empty member}">insert</c:when><c:otherwise>update</c:otherwise></c:choose>.do" method="post">
+            <c:if test="${not empty member}">
+                <input type="hidden" name="memberId" value="${member.memberId}">
             </c:if>
 
             <!-- 기본 정보 -->
@@ -125,37 +125,57 @@
                 <div class="section-title">기본 정보</div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>사번 <span class="req">*</span></label>
-                        <input type="text" name="empId" value="${emp.empId}"
-                               placeholder="예: EMP001"
-                               <c:if test="${not empty emp}">readonly style="background:#F1F5F9;color:#94A3B8"</c:if>
+                        <label>아이디(로그인용) <span class="req">*</span></label>
+                        <input type="text" name="memberId" value="${member.memberId}"
+                               placeholder="예: hong123"
+                               <c:if test="${not empty member}">readonly style="background:#F1F5F9;color:#94A3B8"</c:if>
                                required>
                     </div>
                     <div class="form-group">
+                        <label>사번</label>
+                        <input type="text" name="empNo" value="${member.empNo}" placeholder="예: EMP001">
+                    </div>
+                    <div class="form-group">
                         <label>이름 <span class="req">*</span></label>
-                        <input type="text" name="empName" value="${emp.empName}" placeholder="이름 입력" required>
+                        <input type="text" name="name" value="${member.name}" placeholder="이름 입력" required>
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호 <c:if test="${empty member}"><span class="req">*</span></c:if></label>
+                        <input type="password" name="password"
+                               placeholder="<c:choose><c:when test="${empty member}">초기 비밀번호 설정</c:when><c:otherwise>변경 시에만 입력</c:otherwise></c:choose>"
+                               <c:if test="${empty member}">required</c:if>>
                     </div>
                     <div class="form-group">
                         <label>부서 <span class="req">*</span></label>
-                        <select name="deptId" required>
+                        <input type="hidden" name="department" id="departmentName" value="${member.department}">
+                        <select name="deptId" required onchange="syncDept(this)">
                             <option value="">부서 선택</option>
-                            <%-- DB 연동 후 forEach로 교체 --%>
-                            <option value="D001" <c:if test="${emp.deptId == 'D001'}">selected</c:if>>개발팀</option>
-                            <option value="D002" <c:if test="${emp.deptId == 'D002'}">selected</c:if>>영업팀</option>
-                            <option value="D003" <c:if test="${emp.deptId == 'D003'}">selected</c:if>>인사팀</option>
-                            <option value="D004" <c:if test="${emp.deptId == 'D004'}">selected</c:if>>재무팀</option>
+                            <c:forEach items="${deptList}" var="dept">
+                                <option value="${dept.deptId}" data-name="${dept.deptName}"
+                                    <c:if test="${member.deptId == dept.deptId}">selected</c:if>>
+                                    ${dept.deptName}
+                                </option>
+                            </c:forEach>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>직급 <span class="req">*</span></label>
                         <select name="position" required>
                             <option value="">직급 선택</option>
-                            <option value="사원"  <c:if test="${emp.position == '사원'}">selected</c:if>>사원</option>
-                            <option value="대리"  <c:if test="${emp.position == '대리'}">selected</c:if>>대리</option>
-                            <option value="과장"  <c:if test="${emp.position == '과장'}">selected</c:if>>과장</option>
-                            <option value="차장"  <c:if test="${emp.position == '차장'}">selected</c:if>>차장</option>
-                            <option value="부장"  <c:if test="${emp.position == '부장'}">selected</c:if>>부장</option>
-                            <option value="이사"  <c:if test="${emp.position == '이사'}">selected</c:if>>이사</option>
+                            <option value="사원"  <c:if test="${member.position == '사원'}">selected</c:if>>사원</option>
+                            <option value="대리"  <c:if test="${member.position == '대리'}">selected</c:if>>대리</option>
+                            <option value="과장"  <c:if test="${member.position == '과장'}">selected</c:if>>과장</option>
+                            <option value="차장"  <c:if test="${member.position == '차장'}">selected</c:if>>차장</option>
+                            <option value="부장"  <c:if test="${member.position == '부장'}">selected</c:if>>부장</option>
+                            <option value="이사"  <c:if test="${member.position == '이사'}">selected</c:if>>이사</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>성별</label>
+                        <select name="gender">
+                            <option value="">선택</option>
+                            <option value="M" <c:if test="${member.gender == 'M'}">selected</c:if>>남성</option>
+                            <option value="F" <c:if test="${member.gender == 'F'}">selected</c:if>>여성</option>
                         </select>
                     </div>
                 </div>
@@ -167,11 +187,11 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>연락처</label>
-                        <input type="text" name="phone" value="${emp.phone}" placeholder="010-0000-0000">
+                        <input type="text" name="phone" value="${member.phone}" placeholder="010-0000-0000">
                     </div>
                     <div class="form-group">
                         <label>이메일</label>
-                        <input type="email" name="email" value="${emp.email}" placeholder="example@company.com">
+                        <input type="email" name="email" value="${member.email}" placeholder="example@company.com">
                     </div>
                 </div>
             </div>
@@ -181,24 +201,23 @@
                 <div class="section-title">인사 정보</div>
                 <div class="form-grid col3">
                     <div class="form-group">
-                        <label>입사일 <span class="req">*</span></label>
-                        <input type="date" name="hireDate" value="${emp.hireDate}" required>
+                        <label>생년월일</label>
+                        <input type="date" name="birthDate" value="${member.birthDate}">
                     </div>
                     <div class="form-group">
                         <label>재직 상태</label>
                         <select name="status">
-                            <option value="ACTIVE"  <c:if test="${emp.status == 'ACTIVE' || empty emp}">selected</c:if>>재직</option>
-                            <option value="LEAVE"   <c:if test="${emp.status == 'LEAVE'}">selected</c:if>>휴직</option>
-                            <option value="RESIGN"  <c:if test="${emp.status == 'RESIGN'}">selected</c:if>>퇴직</option>
+                            <option value="ACTIVE" <c:if test="${member.status == 'ACTIVE' || empty member}">selected</c:if>>재직</option>
+                            <option value="LEAVE"  <c:if test="${member.status == 'LEAVE'}">selected</c:if>>휴직</option>
+                            <option value="RESIGN" <c:if test="${member.status == 'RESIGN'}">selected</c:if>>퇴직</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>급여 (원)</label>
-                        <input type="number" name="salary" value="${emp.salary}" placeholder="예: 3500000">
-                    </div>
-                    <div class="form-group form-full">
-                        <label>비고</label>
-                        <textarea name="remark" placeholder="특이사항 입력">${emp.remark}</textarea>
+                        <label>권한</label>
+                        <select name="role">
+                            <option value="USER"  <c:if test="${member.role == 'USER'  || empty member}">selected</c:if>>일반직원</option>
+                            <option value="ADMIN" <c:if test="${member.role == 'ADMIN'}">selected</c:if>>관리자</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -208,7 +227,7 @@
                 <a href="${pageContext.request.contextPath}/hr/list.do" class="btn btn-outline">취소</a>
                 <button type="submit" class="btn btn-primary">
                     <c:choose>
-                        <c:when test="${empty emp}">등록하기</c:when>
+                        <c:when test="${empty member}">등록하기</c:when>
                         <c:otherwise>수정하기</c:otherwise>
                     </c:choose>
                 </button>
@@ -217,6 +236,17 @@
         </form>
     </div>
 
+<script>
+function syncDept(sel) {
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('departmentName').value = opt.getAttribute('data-name') || '';
+}
+// 페이지 로드 시 초기값 세팅
+window.addEventListener('load', function() {
+    var sel = document.querySelector('select[name="deptId"]');
+    if (sel && sel.selectedIndex > 0) syncDept(sel);
+});
+</script>
 </main>
 
 </div>
