@@ -104,16 +104,20 @@
     <label>부서</label>
     <c:choose>
         <c:when test="${loginUser.role == 'ADMIN' or loginUser.department == '인사팀'}">
-         <select name="department">
-    <option value="">선택하세요</option>
-    <c:forEach var="dept" items="${deptList}">
-        <option value="${dept.deptName}" ${member.department == dept.deptName ? 'selected' : ''}>${dept.deptName}</option>
-    </c:forEach>
-</select>
+            <input type="hidden" name="department" id="departmentName" value="${member.department}">
+            <select name="deptId" onchange="syncDept(this)">
+                <option value="">선택하세요</option>
+                <c:forEach var="dept" items="${deptList}">
+                    <option value="${dept.deptId}"
+                            data-name="${dept.deptName}"
+                            ${member.deptId == dept.deptId ? 'selected' : ''}>${dept.deptName}</option>
+                </c:forEach>
+            </select>
         </c:when>
         <c:otherwise>
             <input type="text" value="${member.department}" readonly>
             <input type="hidden" name="department" value="${member.department}">
+            <input type="hidden" name="deptId"     value="${member.deptId}">
         </c:otherwise>
     </c:choose>
 </div>
@@ -128,7 +132,15 @@
                 </div>
                 <div class="form-group">
                     <label>직급</label>
-                    <input type="text" name="position" value="${member.position}" placeholder="예: 과장">
+                    <select name="position">
+                        <option value="">선택하세요</option>
+                        <option value="사원" ${member.position == '사원' ? 'selected' : ''}>사원</option>
+                        <option value="대리" ${member.position == '대리' ? 'selected' : ''}>대리</option>
+                        <option value="과장" ${member.position == '과장' ? 'selected' : ''}>과장</option>
+                        <option value="차장" ${member.position == '차장' ? 'selected' : ''}>차장</option>
+                        <option value="부장" ${member.position == '부장' ? 'selected' : ''}>부장</option>
+                        <option value="이사" ${member.position == '이사' ? 'selected' : ''}>이사</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>권한</label>
@@ -151,5 +163,15 @@
 </main>
 
 </div>
+<script>
+function syncDept(sel) {
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('departmentName').value = opt.getAttribute('data-name') || '';
+}
+window.addEventListener('load', function() {
+    var sel = document.querySelector('select[name="deptId"]');
+    if (sel && sel.selectedIndex > 0) syncDept(sel);
+});
+</script>
 </body>
 </html>

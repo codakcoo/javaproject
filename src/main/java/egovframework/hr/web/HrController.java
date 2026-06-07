@@ -40,9 +40,29 @@ public class HrController {
 
     /** 직원 등록 폼 */
     @GetMapping("/insertForm.do")
-    public String insertForm(HttpSession session) {
+    public String insertForm(Model model, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
+        model.addAttribute("deptList", deptService.getDeptList());
         return "hr/empForm";
+    }
+    
+    /** 직원 등록 처리 */
+    @PostMapping("/insert.do")
+    public String insertEmp(MemberVO member, HttpSession session) {
+        if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
+        try {
+            // 초기 상태값 설정
+            if (member.getStatus() == null || member.getStatus().isEmpty()) {
+                member.setStatus("ACTIVE");
+            }
+            if (member.getRole() == null || member.getRole().isEmpty()) {
+                member.setRole("USER");
+            }
+            memberService.insertMember(member);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "redirect:/hr/list.do";
     }
 
     /** 직원 수정 폼 */
@@ -60,15 +80,23 @@ public class HrController {
     @PostMapping("/update.do")
     public String update(@ModelAttribute MemberVO member, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
-        memberService.updateMember(member);
+        try {
+            memberService.updateMember(member);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "redirect:/hr/list.do";
     }
 
-    /** 직원 삭제 처리 */
+    /** 직원 삭제 처리 (논리 삭제 - status = RESIGN) */
     @PostMapping("/delete.do")
     public String delete(@RequestParam("memberId") String memberId, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
-        memberService.deleteMember(memberId);
+        try {
+            memberService.deleteMember(memberId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "redirect:/hr/list.do";
     }
 

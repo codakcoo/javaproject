@@ -13,4 +13,6 @@ public interface MemberService {
     void           updateMember(MemberVO member);     // 직원 정보 수정
     void           deleteMember(String memberId);     // 직원 삭제
     MemberVO getMemberById(String memberId); // 직원 상세 조회
+    void insertMember(MemberVO member);
+
 }

@@ -25,19 +25,24 @@
     <insert id="insertMember" parameterType="egovframework.member.vo.MemberVO">
         INSERT INTO member (
             member_id, password, name, email, role,
-            status, department, birth_date, phone, gender
+            status, department, birth_date, phone, gender,
+            dept_id, position, emp_no
         ) VALUES (
             #{memberId}, #{password}, #{name}, #{email, jdbcType=VARCHAR}, 'USER',
             'PENDING', #{department, jdbcType=VARCHAR}, #{birthDate, jdbcType=VARCHAR},
-            #{phone, jdbcType=VARCHAR}, #{gender, jdbcType=VARCHAR}
+            #{phone, jdbcType=VARCHAR}, #{gender, jdbcType=VARCHAR},
+            #{deptId, jdbcType=VARCHAR}, #{position, jdbcType=VARCHAR}, #{empNo, jdbcType=VARCHAR}
         )
     </insert>
 
   <!-- status 상관없이 아이디 중복체크용 조회 -->
-   <select id="selectMemberById" parameterType="String" resultMap="memberResultMap">
-    SELECT member_id, password, name, email, role, status
-    FROM   member
-    WHERE  member_id = #{memberId}
+  <select id="selectMemberById" parameterType="String" resultMap="memberResultMap">
+    SELECT m.member_id, m.password, m.name, m.email, m.role, m.status,
+           m.department, m.emp_no, m.birth_date, m.phone,
+           m.position, m.gender, m.dept_id, d.dept_name
+    FROM   member m
+    LEFT JOIN department d ON m.dept_id = d.dept_id
+    WHERE  m.member_id = #{memberId}
   </select>
 
     <!-- 로그인 시 status=ACTIVE 인 사람만 조회 -->
@@ -100,13 +105,16 @@
         phone      = #{phone, jdbcType=VARCHAR},
         role       = #{role},
         emp_no     = #{empNo, jdbcType=VARCHAR}
+        <if test="deptId != null and deptId != ''">
+        , dept_id  = #{deptId}
+        </if>
     WHERE member_id = #{memberId}
-</update>
+    </update>
 
-    <!-- 직원 삭제 -->
-    <delete id="deleteMember" parameterType="String">
-        DELETE FROM member
-        WHERE member_id = #{memberId}
-    </delete>
-    
+    <!-- 직원 삭제 - 논리 삭제 (status = RESIGN) -->
+    <!-- FK 제약조건(salary 등)으로 실제 DELETE 불가 시 논리 삭제 사용 -->
+    <update id="deleteMember" parameterType="String">
+        UPDATE member SET status = 'RESIGN' WHERE member_id = #{memberId}
+    </update>
+
 </mapper>
