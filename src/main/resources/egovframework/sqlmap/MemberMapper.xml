@@ -28,8 +28,9 @@
             status, department, birth_date, phone, gender,
             dept_id, position, emp_no
         ) VALUES (
-            #{memberId}, #{password}, #{name}, #{email, jdbcType=VARCHAR}, 'USER',
-            'PENDING', #{department, jdbcType=VARCHAR}, #{birthDate, jdbcType=VARCHAR},
+            #{memberId}, #{password}, #{name}, #{email, jdbcType=VARCHAR},
+            #{role, jdbcType=VARCHAR},
+            #{status, jdbcType=VARCHAR}, #{department, jdbcType=VARCHAR}, #{birthDate, jdbcType=VARCHAR},
             #{phone, jdbcType=VARCHAR}, #{gender, jdbcType=VARCHAR},
             #{deptId, jdbcType=VARCHAR}, #{position, jdbcType=VARCHAR}, #{empNo, jdbcType=VARCHAR}
         )

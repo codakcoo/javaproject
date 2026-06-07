@@ -51,13 +51,9 @@ public class HrController {
     public String insertEmp(MemberVO member, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         try {
-            // 초기 상태값 설정
-            if (member.getStatus() == null || member.getStatus().isEmpty()) {
-                member.setStatus("ACTIVE");
-            }
-            if (member.getRole() == null || member.getRole().isEmpty()) {
-                member.setRole("USER");
-            }
+            // 관리자가 직원 등록 → 가입 승인 관리에서 승인 후 ACTIVE 전환
+            member.setStatus("PENDING");
+            member.setRole("USER");
             memberService.insertMember(member);
         } catch (Exception e) {
             e.printStackTrace();
