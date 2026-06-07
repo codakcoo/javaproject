@@ -1,3 +1,4 @@
+<% String uri = request.getRequestURI(); %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <style>
@@ -72,61 +73,71 @@
     <!-- 인사관리 -->
     <div class="nav-group">
         <div class="nav-group-title">인사관리</div>
-        <div class="nav-item nav-toggle" onclick="toggleMenu('hrMenu', this)">
+        <div class="nav-item nav-toggle <%= uri.contains("/hr") || uri.contains("/dept") ? "open" : "" %>"
+             onclick="toggleMenu('hrMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 인사/조직 관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub" id="hrMenu">
-            <a href="${pageContext.request.contextPath}/hr/list.do"     class="nav-item" onclick="closeSidebar()">직원 목록</a>
-            <a href="${pageContext.request.contextPath}/dept/list.do"   class="nav-item" onclick="closeSidebar()">부서 관리</a>
-            <a href="${pageContext.request.contextPath}/hr/approval.do" class="nav-item" onclick="closeSidebar()">가입 승인 관리</a>
+        <div class="nav-sub <%= uri.contains("/hr") || uri.contains("/dept") ? "open" : "" %>" id="hrMenu">
+            <a href="${pageContext.request.contextPath}/hr/list.do"
+               class="nav-item <%= uri.contains("/hr/list") ? "active" : "" %>"
+               onclick="closeSidebar()">직원 목록</a>
+            <a href="${pageContext.request.contextPath}/dept/list.do"
+               class="nav-item <%= uri.contains("/dept") ? "active" : "" %>"
+               onclick="closeSidebar()">부서 관리</a>
+            <a href="${pageContext.request.contextPath}/hr/approval.do"
+               class="nav-item <%= uri.contains("/hr/approval") ? "active" : "" %>"
+               onclick="closeSidebar()">가입 승인 관리</a>
         </div>
     </div>
 
     <!-- 영업/재고 -->
     <div class="nav-group">
         <div class="nav-group-title">영업/재고</div>
-        <div class="nav-item nav-toggle" onclick="toggleMenu('productMenu', this)">
+        <div class="nav-item nav-toggle <%= uri.contains("/product") || uri.contains("/stock") || uri.contains("/partner") ? "open" : "" %>"
+             onclick="toggleMenu('productMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.35C18 2.53 15.92 1 13.5 1c-1.32 0-2.5.5-3.5 1.3C9 1.5 7.82 1 6.5 1 4.08 1 2 2.53 2 4.65c0 .47.11.91.18 1.35H0v14h24V6h-4z"/></svg>
                 영업/재고 관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub" id="productMenu">
-            <a href="${pageContext.request.contextPath}/product/list.do"          class="nav-item" onclick="closeSidebar()">상품 관리</a>
-            <a href="${pageContext.request.contextPath}/stock/list.do"            class="nav-item" onclick="closeSidebar()">재고 현황</a>
-            <a href="${pageContext.request.contextPath}/partner/customer/list.do" class="nav-item" onclick="closeSidebar()">고객사 관리</a>
-            <a href="${pageContext.request.contextPath}/partner/supplier/list.do" class="nav-item" onclick="closeSidebar()">공급업체 관리</a>
+        <div class="nav-sub <%= uri.contains("/product") || uri.contains("/stock") || uri.contains("/partner") ? "open" : "" %>" id="productMenu">
+            <a href="${pageContext.request.contextPath}/product/list.do"          class="nav-item <%= uri.contains("/product") ? "active" : "" %>" onclick="closeSidebar()">상품 관리</a>
+            <a href="${pageContext.request.contextPath}/stock/list.do"            class="nav-item <%= uri.contains("/stock") ? "active" : "" %>" onclick="closeSidebar()">재고 현황</a>
+            <a href="${pageContext.request.contextPath}/partner/customer/list.do" class="nav-item <%= uri.contains("/customer") ? "active" : "" %>" onclick="closeSidebar()">고객사 관리</a>
+            <a href="${pageContext.request.contextPath}/partner/supplier/list.do" class="nav-item <%= uri.contains("/supplier") ? "active" : "" %>" onclick="closeSidebar()">공급업체 관리</a>
         </div>
     </div>
 
     <!-- 결재관리 -->
     <div class="nav-group">
         <div class="nav-group-title">결재관리</div>
-        <div class="nav-item nav-toggle" onclick="toggleMenu('approvalMenu', this)">
+        <div class="nav-item nav-toggle <%= uri.contains("/approval") ? "open" : "" %>"
+             onclick="toggleMenu('approvalMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 결재 관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub" id="approvalMenu">
-            <a href="${pageContext.request.contextPath}/approval/list.do"       class="nav-item" onclick="closeSidebar()">전체</a>
-            <a href="${pageContext.request.contextPath}/approval/pending.do"    class="nav-item" onclick="closeSidebar()">기안중</a>
-            <a href="${pageContext.request.contextPath}/approval/inProgress.do" class="nav-item" onclick="closeSidebar()">진행중</a>
-            <a href="${pageContext.request.contextPath}/approval/rejected.do"   class="nav-item" onclick="closeSidebar()">반려</a>
-            <a href="${pageContext.request.contextPath}/approval/approved.do"   class="nav-item" onclick="closeSidebar()">결재</a>
+        <div class="nav-sub <%= uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
+            <a href="${pageContext.request.contextPath}/approval/list.do"       class="nav-item <%= uri.contains("/approval/list") ? "active" : "" %>" onclick="closeSidebar()">전체</a>
+            <a href="${pageContext.request.contextPath}/approval/pending.do"    class="nav-item <%= uri.contains("/approval/pending") ? "active" : "" %>" onclick="closeSidebar()">기안중</a>
+            <a href="${pageContext.request.contextPath}/approval/inProgress.do" class="nav-item <%= uri.contains("/approval/inProgress") ? "active" : "" %>" onclick="closeSidebar()">진행중</a>
+            <a href="${pageContext.request.contextPath}/approval/rejected.do"   class="nav-item <%= uri.contains("/approval/rejected") ? "active" : "" %>" onclick="closeSidebar()">반려</a>
+            <a href="${pageContext.request.contextPath}/approval/approved.do"   class="nav-item <%= uri.contains("/approval/approved") ? "active" : "" %>" onclick="closeSidebar()">결재</a>
         </div>
     </div>
 
     <!-- 주문관리 -->
     <div class="nav-group">
         <div class="nav-group-title">주문관리</div>
-        <div class="nav-item nav-toggle" onclick="toggleMenu('orderMenu', this)">
+        <div class="nav-item nav-toggle <%= uri.contains("/order") || uri.contains("/ocr") ? "open" : "" %>"
+             onclick="toggleMenu('orderMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                 주문관리
@@ -143,16 +154,21 @@
     <!-- 급여관리 -->
     <div class="nav-group">
         <div class="nav-group-title">급여관리</div>
-        <div class="nav-item nav-toggle" onclick="toggleMenu('salaryMenu', this)">
+        <div class="nav-item nav-toggle <%= uri.contains("/salary") ? "open" : "" %>"
+             onclick="toggleMenu('salaryMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
                 급여 관리
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub" id="salaryMenu">
-            <a href="${pageContext.request.contextPath}/salary/list.do" class="nav-item" onclick="closeSidebar()">급여 목록</a>
-            <a href="${pageContext.request.contextPath}/salary/my.do"   class="nav-item" onclick="closeSidebar()">내 급여</a>
+        <div class="nav-sub <%= uri.contains("/salary") ? "open" : "" %>" id="salaryMenu">
+            <a href="${pageContext.request.contextPath}/salary/list.do"
+               class="nav-item <%= uri.contains("/salary/list") ? "active" : "" %>"
+               onclick="closeSidebar()">급여 목록</a>
+            <a href="${pageContext.request.contextPath}/salary/my.do"
+               class="nav-item <%= uri.contains("/salary/my") ? "active" : "" %>"
+               onclick="closeSidebar()">내 급여</a>
         </div>
     </div>
 
@@ -162,7 +178,6 @@
 <script>
 (function () {
     var path = window.location.pathname;
-
     document.querySelectorAll('#sidebar a.nav-item').forEach(function (link) {
         var href = link.getAttribute('href').split('?')[0];
         if (path === href) {
@@ -186,10 +201,10 @@
 function toggleMenu(menuId, btn) {
     var menu   = document.getElementById(menuId);
     var isOpen = menu.classList.contains('open');
-    document.querySelectorAll('.nav-sub').forEach(function (m) {
+    document.querySelectorAll('.nav-sub').forEach(function(m) {
         if (m.id !== menuId) m.classList.remove('open');
     });
-    document.querySelectorAll('.nav-toggle').forEach(function (b) {
+    document.querySelectorAll('.nav-toggle').forEach(function(b) {
         if (b !== btn) b.classList.remove('open');
     });
     menu.classList.toggle('open', !isOpen);
