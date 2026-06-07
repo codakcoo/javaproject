@@ -1,4 +1,5 @@
-<% String uri = request.getRequestURI(); %>
+<%String _fwd = (String) request.getAttribute("javax.servlet.forward.request_uri");
+String uri  = (_fwd != null) ? _fwd : request.getRequestURI();%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <style>
