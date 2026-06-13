@@ -2,11 +2,14 @@ package egovframework.hr.web;
 
 import egovframework.member.service.MemberService;
 import egovframework.member.vo.MemberVO;
+import egovframework.salary.service.SalaryService;
+import egovframework.salary.vo.SalaryVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.List;
 import egovframework.dept.service.DeptService;
 import egovframework.dept.vo.DeptVO;
@@ -17,6 +20,8 @@ public class HrController {
 
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private SalaryService salaryService;
     @Autowired
     private DeptService deptService;
 
@@ -110,6 +115,19 @@ public class HrController {
     public String approve(@RequestParam("memberId") String memberId, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         memberService.updateMemberStatus(memberId, "ACTIVE");
+
+        // ★ 급여 레코드 자동 생성 (없는 경우에만)
+        try {
+            if (salaryService.getSalaryByMemberId(memberId) == null) {
+                SalaryVO salary = new SalaryVO();
+                salary.setMemberId(memberId);
+                salary.setPayYear(LocalDate.now().getYear());
+                salary.setPayMonth(LocalDate.now().getMonthValue());
+                salaryService.saveSalary(salary);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "redirect:/hr/approval.do";
     }
 
