@@ -52,7 +52,7 @@
                department, emp_no, birth_date, phone, position, gender
         FROM   member
         WHERE  member_id = #{memberId}
-        AND    status = 'ACTIVE'
+        AND    ((status = 'ACTIVE') OR (status = 'RESIGN'))
     </select>
 
     <!-- 결재자 목록 (전체 회원) -->
