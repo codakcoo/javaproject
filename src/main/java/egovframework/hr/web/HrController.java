@@ -52,14 +52,23 @@ public class HrController {
     }
     
     /** 직원 등록 처리 */
+
     @PostMapping("/insert.do")
     public String insertEmp(MemberVO member, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         try {
-            // 관리자가 직원 등록 → 가입 승인 관리에서 승인 후 ACTIVE 전환
-            member.setStatus("PENDING");
+            member.setStatus("ACTIVE"); // 관리자 직접 등록은 바로 ACTIVE
             member.setRole("USER");
             memberService.insertMember(member);
+
+            // salary 자동 생성
+            if (salaryService.getSalaryByMemberId(member.getMemberId()) == null) {
+                SalaryVO salary = new SalaryVO();
+                salary.setMemberId(member.getMemberId());
+                salary.setPayYear(LocalDate.now().getYear());
+                salary.setPayMonth(LocalDate.now().getMonthValue());
+                salaryService.saveSalary(salary);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

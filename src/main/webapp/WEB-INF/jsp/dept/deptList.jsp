@@ -79,6 +79,29 @@
     </div>
 </div>
 
+<!-- 삭제 불가 모달 -->
+<div class="alert-modal-bg" id="deleteBlockModal">
+    <div class="alert-modal">
+        <div class="alert-icon">🚫</div>
+        <h4>삭제 불가</h4>
+        <p id="deleteBlockMsg">소속 직원이 있어 삭제할 수 없습니다.</p>
+        <button class="alert-modal-btn" onclick="document.getElementById('deleteBlockModal').classList.remove('active')">확인</button>
+    </div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="alert-modal-bg" id="deleteConfirmModal">
+    <div class="alert-modal">
+        <div class="alert-icon">🗑️</div>
+        <h4>부서 삭제</h4>
+        <p id="deleteConfirmMsg">부서를 삭제하시겠습니까?</p>
+        <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+            <button class="alert-modal-btn" style="background:#E11D48;" onclick="submitDelete()">삭제</button>
+            <button class="alert-modal-btn" style="background:#94A3B8;" onclick="document.getElementById('deleteConfirmModal').classList.remove('active')">취소</button>
+        </div>
+    </div>
+</div>
+<
 <main id="content">
     <div class="page-title">부서 관리</div>
     <div class="page-sub">부서 목록을 조회하고 추가/수정/삭제합니다.</div>
@@ -117,11 +140,11 @@
                                             <c:if test="${loginUser.role == 'ADMIN' or loginUser.department == '인사팀'}">
                                                 <button class="btn-edit"
                                                     onclick="openEditModal('${dept.deptId}', '${dept.deptName}')">수정</button>
-                                                <form action="${pageContext.request.contextPath}/dept/delete.do" method="post" style="display:inline">
-                                                    <input type="hidden" name="deptId" value="${dept.deptId}">
-                                                    <button type="submit" class="btn-del"
-                                                        onclick="return confirm('${dept.deptName} 부서를 삭제하시겠습니까?\\n소속 직원이 있으면 삭제할 수 없습니다.')">삭제</button>
-                                                </form>
+                <form id="deleteForm_${dept.deptId}" action="${pageContext.request.contextPath}/dept/delete.do" method="post" style="display:inline">
+    <input type="hidden" name="deptId" value="${dept.deptId}">
+    <button type="button" class="btn-del"
+        onclick="confirmDelete('${dept.deptId}', '${dept.deptName}', ${dept.empCount})">삭제</button>
+                                    </form>
                                             </c:if>
                                         </div>
                                     </td>
@@ -209,6 +232,26 @@ document.querySelector('.modal-btn-save').addEventListener('click', function() {
         document.getElementById('editForm').submit();
     });
 });
+
+var currentDeleteId = null;
+
+function confirmDelete(deptId, deptName, empCount) {
+    if (empCount > 0) {
+        document.getElementById('deleteBlockMsg').textContent = 
+            '"' + deptName + '" 부서에 소속 직원 ' + empCount + '명이 있어 삭제할 수 없습니다.';
+        document.getElementById('deleteBlockModal').classList.add('active');
+    } else {
+        currentDeleteId = deptId;
+        document.getElementById('deleteConfirmMsg').textContent = 
+            '"' + deptName + '" 부서를 삭제하시겠습니까?';
+        document.getElementById('deleteConfirmModal').classList.add('active');
+    }
+}
+
+function submitDelete() {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+    document.getElementById('deleteForm_' + currentDeleteId).submit();
+}
 </script>
 </body>
 </html>

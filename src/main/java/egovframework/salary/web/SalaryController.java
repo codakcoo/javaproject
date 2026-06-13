@@ -18,14 +18,14 @@ public class SalaryController {
     private SalaryService salaryService;
 
     /** 급여 목록 (ADMIN/운영팀만) */
-    @GetMapping("/list.do")
+    @GetMapping("/list.do") 
     public String salaryList(Model model, HttpSession session) {
         if (session.getAttribute("loginUser") == null) return "redirect:/login.do";
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        // ADMIN 또는 운영팀만 접근 가능
-        if (!loginUser.getRole().equals("ADMIN") && !("운영팀".equals(loginUser.getDepartment()))) {
+        if (!loginUser.getRole().equals("ADMIN") && !(("운영팀").equals(loginUser.getDepartment()))) {
             return "redirect:/main.do";
         }
+        salaryService.syncMissingSalaries(); // ← 이거 추가
         List<SalaryVO> salaryList = salaryService.getSalaryList();
         model.addAttribute("salaryList", salaryList);
         return "salary/salaryList";

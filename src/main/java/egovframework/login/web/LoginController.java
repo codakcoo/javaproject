@@ -94,8 +94,11 @@ public class LoginController {
     public String registerProcess(@ModelAttribute MemberVO member, Model model) {
         if (memberService.isDuplicateId(member.getMemberId())) {
             model.addAttribute("errorMsg", "이미 사용 중인 아이디입니다.");
+            model.addAttribute("deptList", deptService.getDeptList()); // ← 이거 추가
             return "login/register";
         }
+        member.setStatus("PENDING");
+        member.setRole("USER");
         memberService.register(member);
         return "redirect:/login.do";
     }

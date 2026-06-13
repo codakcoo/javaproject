@@ -56,4 +56,17 @@
         WHERE salary_id = #{salaryId}
     </update>
 
+
+<!-- salary 없는 ACTIVE 직원 자동 일괄 INSERT -->
+<insert id="insertMissingSalaries">
+    INSERT INTO salary (member_id, base_salary, pay_year, pay_month)
+    SELECT m.member_id,
+           COALESCE(sg.base_salary, 0),
+           YEAR(NOW()),
+           MONTH(NOW())
+    FROM member m
+    LEFT JOIN salary_grade sg ON m.position = sg.position
+    WHERE m.status = 'ACTIVE'
+    AND m.member_id NOT IN (SELECT member_id FROM salary)
+</insert>
 </mapper>

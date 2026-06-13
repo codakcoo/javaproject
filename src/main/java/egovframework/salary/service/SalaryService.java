@@ -7,4 +7,5 @@ public interface SalaryService {
     List<SalaryVO> getSalaryList();
     SalaryVO       getSalaryByMemberId(String memberId);
     void           saveSalary(SalaryVO salary);
+    void syncMissingSalaries();
 }
