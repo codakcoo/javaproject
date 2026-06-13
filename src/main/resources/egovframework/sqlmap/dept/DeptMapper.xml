@@ -21,7 +21,7 @@
                d.created_at
         FROM   department d
         LEFT JOIN member m ON d.manager_id = m.member_id
-        LEFT JOIN member e ON e.dept_id = d.dept_id AND e.status = 'ACTIVE'
+    	LEFT JOIN member e ON e.dept_id = d.dept_id AND e.status != 'RESIGN'
         GROUP BY d.dept_id, d.dept_name, d.manager_id, m.name, d.created_at
         ORDER BY d.dept_id
     </select>

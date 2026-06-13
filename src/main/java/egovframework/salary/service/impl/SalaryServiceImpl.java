@@ -27,4 +27,10 @@ public class SalaryServiceImpl implements SalaryService {
     public void saveSalary(SalaryVO salary) {
         salaryMapper.insertSalary(salary);
     }
+    
+    @Override
+    public void syncMissingSalaries() {
+        salaryMapper.insertMissingSalaries();
+    }
 }
+

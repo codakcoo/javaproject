@@ -10,4 +10,5 @@ public interface SalaryMapper {
     SalaryVO       selectSalaryByMemberId(String memberId);
     void           insertSalary(SalaryVO salary);
     void           updateSalary(SalaryVO salary);
+    void insertMissingSalaries();
 }
