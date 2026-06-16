@@ -117,7 +117,7 @@ String uri  = (_fwd != null) ? _fwd : request.getRequestURI();%>
     <!-- 결재관리 -->
     <div class="nav-group">
         <div class="nav-group-title">결재관리</div>
-        <div class="nav-item nav-toggle <%= uri.contains("/approval") ? "open" : "" %>"
+        <div class="nav-item nav-toggle <%= uri.contains("/approval/") ? "open" : "" %>"
              onclick="toggleMenu('approvalMenu', this)">
             <div class="toggle-left">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -125,7 +125,7 @@ String uri  = (_fwd != null) ? _fwd : request.getRequestURI();%>
             </div>
             <svg class="arr" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
         </div>
-        <div class="nav-sub <%= uri.contains("/approval") ? "open" : "" %>" id="approvalMenu">
+        <div class="nav-sub <%= uri.contains("/approval/") ? "open" : "" %>" id="approvalMenu">
             <a href="${pageContext.request.contextPath}/approval/list.do"       class="nav-item <%= uri.contains("/approval/list") ? "active" : "" %>" onclick="closeSidebar()">전체</a>
             <a href="${pageContext.request.contextPath}/approval/pending.do"    class="nav-item <%= uri.contains("/approval/pending") ? "active" : "" %>" onclick="closeSidebar()">기안중</a>
             <a href="${pageContext.request.contextPath}/approval/inProgress.do" class="nav-item <%= uri.contains("/approval/inProgress") ? "active" : "" %>" onclick="closeSidebar()">진행중</a>
