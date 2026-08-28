@@ -10,7 +10,6 @@ import java.util.UUID;
 public class OcrService {
 
     private static final String API_URL = "https://jllp93zoyi.apigw.ntruss.com/custom/v1/53268/39d3f3275508a1b129280c3f0215106087926a316c46c826cfdad6547e237a12/general";
-    private static final String SECRET_KEY = "cllTVlp6R2pwa2lUV0RrelpOVk1YWGRlR1ZPRFNCT2E=";
 
     public String callClovaOcr(byte[] imageBytes, String fileName) throws Exception {
         URL url = new URL(API_URL);
